@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NPS da Loja</title>
+  <style>
+    :root {
+      --bg:#0f172a;         /* slate-900 */
+      --card:#111827;       /* gray-900 */
+      --muted:#94a3b8;      /* slate-400 */
+      --text:#e5e7eb;       /* gray-200 */
+      --accent:#22c55e;     /* green-500 */
+      --danger:#ef4444;     /* red-500 */
+      --brand:#38bdf8;      /* sky-400 */
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji"; background:linear-gradient(120deg,#0b1021,#0f172a 40%,#0b1021); color:var(--text)}
+    .wrap{max-width:760px; margin:4rem auto; padding:1rem}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:28px 24px; box-shadow:0 10px 30px rgba(0,0,0,0.35)}
+    h1{margin:0 0 .25rem 0; font-size:1.75rem}
+    p.sub{margin:.25rem 0 1.25rem 0; color:var(--muted)}
+    label{display:block; font-size:.95rem; margin:.5rem 0 .4rem; color:#cbd5e1}
+    select, textarea, input[type="text"], button{width:100%; padding:.85rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:#0b1224; color:var(--text)}
+    textarea{min-height:110px; resize:vertical}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    .help{font-size:.8rem; color:var(--muted)}
+    .scale{display:grid; grid-template-columns:repeat(11,1fr); gap:6px; margin:.35rem 0 1rem}
+    .btn-score{appearance:none; border:1px solid rgba(255,255,255,.12); background:#0b1224; color:#cbd5e1; padding:.7rem 0; border-radius:12px; cursor:pointer; transition:.15s; font-weight:600}
+    .btn-score:hover{transform:translateY(-2px); box-shadow:0 8px 16px rgba(0,0,0,.25)}
+    .btn-score[data-active="true"]{background:#0f1b39; border-color:#60a5fa}
+    .btn-score[data-val="0"],[data-val="1"],[data-val="2"]{--col:var(--danger)}
+    .btn-score[data-val="9"],[data-val="10"]{--col:var(--accent)}
+    .legend{display:flex; justify-content:space-between; font-size:.85rem; color:var(--muted); margin-top:.25rem}
+    .actions{display:flex; gap:10px; align-items:center; margin-top:18px}
+    button.submit{background:linear-gradient(90deg,#22d3ee,#60a5fa); border:none; color:#0b1021; font-weight:800; letter-spacing:.2px}
+    button.submit:disabled{opacity:.5}
+    .notice{margin-top:8px; font-size:.8rem; color:var(--muted)}
+    .toast{position:fixed; right:16px; bottom:16px; background:#0b1224; border:1px solid rgba(255,255,255,.15); padding:12px 14px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.35); transform:translateY(20px); opacity:0; transition:.2s}
+    .toast.show{transform:none; opacity:1}
+    .tag{display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:.25rem .6rem; font-size:.78rem; color:#cbd5e1}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap">
+        <div>
+          <h1>NPS da Loja</h1>
+          <p class="sub">De 0 a 10, qual a probabilidade de você nos recomendar?</p>
+        </div>
+      </div>
+
+      <!-- ATENÇÃO: Substitua pela URL do Webhook do n8n -->
+      <script>
+        const N8N_WEBHOOK_URL = "https://webhook.franciscojlalves.com.br/webhook/nps-intake"; // ex.: https://n8n.suaempresa.com/webhook/nps-intake
+        const USE_BASIC_AUTH = false;          // se o webhook exigir Basic Auth
+        const BASIC_AUTH_HEADER = "Basic USVEMDo3VsdHJhc2VjcmV0"; // base64(user:pass)
+        const EXTRA_SECRET = "";               // opcional: querystring ?key=SEU_TOKEN
+      </script>
+
+      <form id="npsForm" novalidate>
+        <label for="attendant">Quem te atendeu?</label>
+        <select id="attendant" required>
+          <option value="" selected disabled>Selecione…</option>
+          <option>João</option>
+          <option>Maria</option>
+          <option>Ana</option>
+          <option>Carlos</option>
+        </select>
+        <label>Nota (0–10)</label>
+        <div class="scale" id="scoreScale" aria-label="Nota NPS">
+          <!-- botões 0..10 -->
+        </div>
+        <label for="comment">Quer deixar um comentário? (opcional)</label>
+        <textarea id="comment" placeholder="Conte rapidamente sua experiência"></textarea>
+        <div class="actions">
+          <button class="submit" type="submit">Enviar</button>
+          <span class="help">Leva menos de 10 segundos. Obrigado! ❤️</span>
+        </div>
+        <div class="notice">Ao enviar, você concorda com o uso dos dados para fins de melhoria do atendimento.</div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // monta botões da escala 0..10
+    const scale = document.getElementById('scoreScale');
+    for (let i=0;i<=10;i++){
+      const b=document.createElement('button');
+      b.type='button';
+      b.className='btn-score';
+      b.dataset.val=String(i);
+      b.textContent=String(i);
+      b.addEventListener('click',()=>{
+        document.querySelectorAll('.btn-score').forEach(x=>x.dataset.active='false');
+        b.dataset.active='true';
+        b.setAttribute('aria-pressed','true');
+      });
+      scale.appendChild(b);
+    }
+
+    function toast(msg){
+      const t=document.getElementById('toast');
+      t.textContent=msg; t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'), 3500);
+    }
+
+    function getSelectedScore(){
+      const el = document.querySelector('.btn-score[data-active="true"]');
+      return el ? Number(el.dataset.val) : null;
+    }
+
+    function npsCategory(score){
+      if(score<=6) return 'Detractor';
+      if(score<=8) return 'Passive';
+      return 'Promoter';
+    }
+
+    document.getElementById('npsForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const attendant = document.getElementById('attendant').value;
+      const score = getSelectedScore();
+      const comment = document.getElementById('comment').value.trim();
+      if(!attendant){ toast('Selecione o atendente.'); return; }
+      if(score===null){ toast('Escolha uma nota de 0 a 10.'); return; }
+
+      const payload = {
+        timestamp: new Date().toISOString(),
+        attendant_name: attendant,
+        score,
+        category: npsCategory(score),
+        comment,
+        channel: 'QR',        client_meta: {
+          ua: navigator.userAgent,
+          lang: navigator.language,
+          platform: navigator.platform
+        }
+      };
+
+      try{
+        const url = EXTRA_SECRET ? `${N8N_WEBHOOK_URL}?key=${encodeURIComponent(EXTRA_SECRET)}` : N8N_WEBHOOK_URL;
+        const res = await fetch(url, {
+          method:'POST',
+          headers: Object.assign({ 'Content-Type':'application/json' }, USE_BASIC_AUTH ? { 'Authorization': BASIC_AUTH_HEADER } : {}),
+          body: JSON.stringify(payload)
+        });
+
+        if(!res.ok) throw new Error('Falha no envio: '+res.status);
+        toast('Obrigado! Resposta registrada.');
+        // reset visual
+        document.getElementById('npsForm').reset();
+        document.querySelectorAll('.btn-score').forEach(x=>x.dataset.active='false');
+      }catch(err){
+        console.error(err);
+        toast('Ops! Tente novamente em instantes.');
+      }
+    });
+  </script>
+</body>
+</html>
