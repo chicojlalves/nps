@@ -233,15 +233,15 @@
         const toNum = v => Number.isFinite(Number(v)) ? Number(v) : 0;
     
         document.getElementById('kpi-nps')  ?.textContent == toPct(s.nps);
-        document.getElementById('kpi-total')?.textContent = s.total ?? '–';
-        document.getElementById('kpi-prom') ?.textContent = s.promoters ?? '–';
-        document.getElementById('kpi-detr') ?.textContent = s.detractors ?? '–';
+        document.getElementById('kpi-total')?.textContent == s.total ?? '–';
+        document.getElementById('kpi-prom') ?.textContent == s.promoters ?? '–';
+        document.getElementById('kpi-detr') ?.textContent == s.detractors ?? '–';
     
         const trendTxt = v => (v==null?'':`${v>0?'+':''}${v}`);
-        document.getElementById('kpi-nps-trend')  ?.textContent = trendTxt(Number(s.trend?.nps));
-        document.getElementById('kpi-total-trend')?.textContent = trendTxt(Number(s.trend?.total));
-        document.getElementById('kpi-prom-trend') ?.textContent = trendTxt(Number(s.trend?.prom));
-        document.getElementById('kpi-detr-trend') ?.textContent = trendTxt(Number(s.trend?.detr));
+        document.getElementById('kpi-nps-trend')  ?.textContent == trendTxt(Number(s.trend?.nps));
+        document.getElementById('kpi-total-trend')?.textContent == trendTxt(Number(s.trend?.total));
+        document.getElementById('kpi-prom-trend') ?.textContent == trendTxt(Number(s.trend?.prom));
+        document.getElementById('kpi-detr-trend') ?.textContent == trendTxt(Number(s.trend?.detr));
     
         // BY ATTENDANT (barras)
         const baWrap = await apiGet(API.byAttendant, params);
