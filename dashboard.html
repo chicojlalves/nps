@@ -94,11 +94,15 @@
     }
 
     async function apiGet(url, params){
-      const qs = new URLSearchParams(params || {});
+      const qs = new URLSearchParams();
+      if (params?.from) qs.append('from', params.from);
+      if (params?.to) qs.append('to', params.to);
+      if (params?.attendant) qs.append('attendant', params.attendant.trim());
       const full = qs.toString() ? `${url}?${qs}` : url;
-      const r = await fetch(full, { method:'GET' });
-      if(!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json(); // espera { data: ... }
+    
+      const res = await fetch(full, { method:'GET', cache:'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json(); // espera { data: ... }
     }
 
     // ======== HELPERS ========
@@ -194,67 +198,48 @@
     }
 
 
-    async function refresh(){
+     async function refresh(){
       const params = collectFilters();
-      await apiGet(API.summary, params);
-      await apiGet(API.byAttendant, params);
-      await apiGet(API.timeseries, params);
-      await apiGet(API.comments, params);
-    
-      try {
-        // SUMMARY (KPIs)
-        const sWrap = await apiGet(API.summary, params);
-        const s = (sWrap && typeof sWrap === 'object' && sWrap.data) ? sWrap.data : {};
-        const toPct = v => Number.isFinite(Number(v)) ? `${Math.round(Number(v))}%` : '–';
-        const toNum = v => Number.isFinite(Number(v)) ? Number(v) : 0;
-    
-        document.getElementById('kpi-nps')  ?.textContent == toPct(s.nps);
-        document.getElementById('kpi-total')?.textContent == s.total ?? '–';
-        document.getElementById('kpi-prom') ?.textContent == s.promoters ?? '–';
-        document.getElementById('kpi-detr') ?.textContent == s.detractors ?? '–';
-    
-        const trendTxt = v => (v==null?'':`${v>0?'+':''}${v}`);
-        document.getElementById('kpi-nps-trend')  ?.textContent == trendTxt(Number(s.trend?.nps));
-        document.getElementById('kpi-total-trend')?.textContent == trendTxt(Number(s.trend?.total));
-        document.getElementById('kpi-prom-trend') ?.textContent == trendTxt(Number(s.trend?.prom));
-        document.getElementById('kpi-detr-trend') ?.textContent == trendTxt(Number(s.trend?.detr));
-    
-        // BY ATTENDANT (barras)
-        const baWrap = await apiGet(API.byAttendant, params);
-        const ba = Array.isArray(baWrap?.data) ? baWrap.data : [];
-        chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x => String(x.attendant ?? '—')) } });
-        chartByAtt.updateSeries([{ name:'NPS', data: ba.map(x => toNum(x.nps)) }]);
-    
-        // TIMESERIES (linha)
-        const tsWrap = await apiGet(API.timeseries, params);
-        const ts = Array.isArray(tsWrap?.data) ? tsWrap.data : [];
-        const toPoint = x => {
-          const t = new Date(x.date);
-          const y = toNum(x.nps);
-          return Number.isFinite(t.getTime()) ? { x: t.getTime(), y } : null;
-        };
-        const series = ts.map(toPoint).filter(Boolean);
-        chartTimes.updateSeries([{ name:'NPS', data: series }]);
-    
-        // DONUT
-        chartDonut.updateSeries([ toNum(s.promoters), toNum(s.passives), toNum(s.detractors) ]);
-    
-        // TABELA DE COMENTÁRIOS (se você já usa params nela)
-        await loadComments(params);
-    
-        document.getElementById('lastUpdate')?.textContent == new Date().toLocaleString();
-      } catch (err) {
-        console.error('refresh error:', err);
-      }
+      
+      // SUMMARY
+      const s = (await apiGet(API.summary, params)).data || {};
+      document.getElementById('kpi-nps').textContent   = Number.isFinite(+s.nps) ? `${Math.round(+s.nps)}%` : '–';
+      document.getElementById('kpi-total').textContent = s.total ?? '–';
+      document.getElementById('kpi-prom').textContent  = s.promoters ?? '–';
+      document.getElementById('kpi-detr').textContent  = s.detractors ?? '–';
+      
+      // BY ATTENDANT
+      const ba = (await apiGet(API.byAttendant, params)).data || [];
+      chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x=>String(x.attendant||'—')) } });
+      chartByAtt.updateSeries([{ name:'NPS', data: ba.map(x=>Number(x.nps)||0) }]);
+      
+      // TIMESERIES
+      const ts = (await apiGet(API.timeseries, params)).data || [];
+      chartTimes.updateSeries([{
+        name:'NPS',
+        data: ts.map(x=>({ x: new Date(x.date).getTime(), y: Number(x.nps)||0 }))
+                .filter(p=>Number.isFinite(p.x))
+      }]);
+      
+      // COMMENTS (se a tabela deve filtrar também)
+      if (API.comments) await loadComments(params);
+      
+      document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
     }
 
+
     function collectFilters(){
-      return {
-        from: document.getElementById('from').value,
-        to:   document.getElementById('to').value,
-        attendant: document.getElementById('attendant').value
-      };
+      const from = document.getElementById('from').value;
+      const to   = document.getElementById('to').value;
+      const att  = (document.getElementById('attendant').value || '').trim();
+      return { from, to, attendant: att || undefined };
     }
+    
+    // se o botão está dentro de <form>, previna submit
+    document.getElementById('apply').addEventListener('click', (e)=>{
+      e.preventDefault?.();
+      refresh(); // não use outra função aqui
+    });
 
     function trendText(v, invert){
       if(v==null) return '';
