@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard NPS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <style>
+    :root{
+      --bg:#0b1021; --panel:#0f172a; --muted:#94a3b8; --text:#e5e7eb; --brand:#22d3ee; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial; background:linear-gradient(120deg,#0b1021,#0f172a); color:var(--text)}
+    .wrap{max-width:1180px; margin:24px auto; padding:0 16px}
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px}
+    h1{margin:0; font-size:1.6rem}
+    .filters{display:flex; flex-wrap:wrap; gap:10px; align-items:end}
+    .field{display:flex; flex-direction:column; gap:6px}
+    .field label{font-size:.85rem; color:var(--muted)}
+    .field input,.field select, .btn{background:#0b1224; color:var(--text); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:.6rem .75rem}
+    .btn{cursor:pointer; font-weight:700}
+    .grid{display:grid; gap:14px}
+    @media (min-width: 920px){ .grid.cols-4{grid-template-columns:repeat(4,1fr)} }
+    @media (min-width: 920px){ .grid.cols-2{grid-template-columns:repeat(2,1fr)} }
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .kpi{display:flex; flex-direction:column; gap:2px}
+    .kpi .label{font-size:.8rem; color:var(--muted)}
+    .kpi .value{font-size:1.8rem; font-weight:800}
+    .kpi .trend{font-size:.8rem}
+    .kpi .trend.ok{color:var(--ok)} .kpi .trend.bad{color:var(--bad)}
+    .chart{height:320px}
+    .footer{opacity:.6; font-size:.8rem; margin:18px 0; text-align:center}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Dashboard NPS</h1>
+      <div class="filters">
+        <div class="field"><label>De</label><input type="date" id="from"></div>
+        <div class="field"><label>Até</label><input type="date" id="to"></div>
+        <div class="field"><label>Atendente</label><select id="attendant"><option value="">Todos</option></select></div>
+        <div class="field"><label>Canal</label><select id="channel"><option value="">Todos</option><option>QR</option><option>WhatsApp</option></select></div>
+        <button class="btn" id="apply">Aplicar</button>
+      </div>
+    </header>
+
+    <section class="grid cols-4">
+      <div class="card kpi"><div class="label">NPS Geral</div><div class="value" id="kpi-nps">–</div><div class="trend" id="kpi-nps-trend"></div></div>
+      <div class="card kpi"><div class="label">Respostas</div><div class="value" id="kpi-total">–</div><div class="trend" id="kpi-total-trend"></div></div>
+      <div class="card kpi"><div class="label">Promotores</div><div class="value" id="kpi-prom">–</div><div class="trend" id="kpi-prom-trend"></div></div>
+      <div class="card kpi"><div class="label">Detratores</div><div class="value" id="kpi-detr">–</div><div class="trend" id="kpi-detr-trend"></div></div>
+    </section>
+
+    <section class="grid cols-2" style="margin-top:14px">
+      <div class="card"><div id="chartByAtt" class="chart"></div></div>
+      <div class="card"><div id="chartTimeseries" class="chart"></div></div>
+    </section>
+
+    <section style="margin-top:14px">
+      <div class="card"><div id="chartDonut" class="chart"></div></div>
+    </section>
+
+    <div class="footer">Atualizado: <span id="lastUpdate">–</span></div>
+  </div>
+
+  <script>
+    // ======== CONFIG ========
+    // Substitua estes endpoints pelos do seu n8n quando prontos
+    const API = {
+      summary: '/api/mock/summary',
+      byAttendant: 'https://webhook.franciscojlalves.com.br/webhook/nps/attendants',
+      timeseries: '/api/mock/timeseries',
+      attendants: '/api/mock/attendants'
+    };
+
+    // Quando não houver endpoints ainda, usamos dados mockados
+    function mockDelay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+    async function mockFetch(url, params){
+      await mockDelay(200);
+      if(url.includes('attendants')) return { data:["Ana","Carlos","João","Maria"] };
+      if(url.includes('summary')) return { data:{ nps: 62, total: 128, promoters: 72, passives: 34, detractors: 22, trend:{nps:+4,total:+12,prom:+5,detr:-3} } };
+      if(url.includes('by-attendant')) return { data:[
+        { attendant:"Ana", nps: 75, total: 30 },
+        { attendant:"Carlos", nps: 58, total: 26 },
+        { attendant:"João", nps: 66, total: 41 },
+        { attendant:"Maria", nps: 52, total: 31 }
+      ] };
+      if(url.includes('timeseries')) return { data:[
+        { date:"2025-08-01", nps:55, total:10 },
+        { date:"2025-08-02", nps:60, total:12 },
+        { date:"2025-08-03", nps:62, total:14 },
+        { date:"2025-08-04", nps:59, total:9 },
+        { date:"2025-08-05", nps:64, total:15 },
+        { date:"2025-08-06", nps:68, total:17 },
+        { date:"2025-08-07", nps:66, total:16 }
+      ] };
+      return { data: null };
+    }
+
+    async function apiGet(url, params){
+      // Troque mockFetch por fetch(url) quando tiver endpoint de verdade.
+      return mockFetch(url, params);
+    }
+
+    // ======== HELPERS ========
+    function fmtPct(n){ return (n==null||isNaN(n)) ? '–' : `${Math.round(n)}%`; }
+    function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent = val; }
+
+    // ======== CHARTS ========
+    let chartByAtt, chartTimes, chartDonut;
+    function mountCharts(){
+      chartByAtt = new ApexCharts(document.querySelector('#chartByAtt'), {
+        chart:{ type:'bar', height:320, toolbar:{show:false}, animations:{enabled:true} },
+        series:[{ name:'NPS', data:[] }],
+        xaxis:{ categories:[], labels:{style:{colors:'#cbd5e1'}} },
+        yaxis:{ labels:{style:{colors:'#cbd5e1'}}, max:100 },
+        dataLabels:{ enabled:true },
+        grid:{ borderColor:'rgba(255,255,255,.08)' },
+        theme:{ mode:'dark' }
+      });
+      chartByAtt.render();
+
+      chartTimes = new ApexCharts(document.querySelector('#chartTimeseries'), {
+        chart:{ type:'line', height:320, toolbar:{show:false}, animations:{enabled:true} },
+        series:[{ name:'NPS', data:[] }],
+        xaxis:{ type:'datetime', labels:{style:{colors:'#cbd5e1'}} },
+        yaxis:{ labels:{style:{colors:'#cbd5e1'}}, max:100 },
+        stroke:{ width:3 },
+        grid:{ borderColor:'rgba(255,255,255,.08)' },
+        theme:{ mode:'dark' }
+      });
+      chartTimes.render();
+
+      chartDonut = new ApexCharts(document.querySelector('#chartDonut'), {
+        chart:{ type:'donut', height:320 },
+        labels:['Promotores','Neutros','Detratores'],
+        series:[0,0,0],
+        dataLabels:{ enabled:true },
+        legend:{ labels:{colors:'#cbd5e1'} },
+        theme:{ mode:'dark' }
+      });
+      chartDonut.render();
+    }
+
+    // ======== LOAD / UPDATE ========
+    async function loadAttendants(){
+      const { data } = await apiGet(API.attendants);
+      const sel = document.getElementById('attendant');
+      sel.innerHTML = '<option value="">Todos</option>' + data.map(a=>`<option>${a}</option>`).join('');
+    }
+
+    async function refresh(){
+      const params = collectFilters();
+      // SUMMARY
+      const s = (await apiGet(API.summary, params)).data;
+      setText('kpi-nps', fmtPct(s.nps));
+      setText('kpi-total', s.total);
+      setText('kpi-prom', s.promoters);
+      setText('kpi-detr', s.detractors);
+      setText('kpi-nps-trend', trendText(s.trend?.nps));
+      setText('kpi-total-trend', trendText(s.trend?.total));
+      setText('kpi-prom-trend', trendText(s.trend?.prom));
+      setText('kpi-detr-trend', trendText(s.trend?.detr, true));
+
+      // BY ATTENDANT
+      const ba = (await apiGet(API.byAttendant, params)).data;
+      chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x=>x.attendant) } });
+      chartByAtt.updateSeries([{ name:'NPS', data: ba.map(x=>x.nps) }]);
+
+      // TIMESERIES
+      const ts = (await apiGet(API.timeseries, params)).data;
+      chartTimes.updateSeries([{ name:'NPS', data: ts.map(x=>({ x: new Date(x.date).getTime(), y: x.nps })) }]);
+
+      // DONUT
+      const prom = s.promoters || 0, pass = s.passives || 0, detr = s.detractors || 0;
+      chartDonut.updateSeries([prom, pass, detr]);
+
+      document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+    }
+
+    function collectFilters(){
+      const from = document.getElementById('from').value;
+      const to = document.getElementById('to').value;
+      const att = document.getElementById('attendant').value;
+      const ch = document.getElementById('channel').value;
+      return { from, to, attendant: att, channel: ch };
+    }
+
+    function trendText(v, invert){
+      if(v==null) return '';
+      const sign = v>0 ? '+' : '';
+      const cls = (invert? -v : v) >= 0 ? 'ok' : 'bad';
+      return `${sign}${v}${typeof v==='number'?'':''}`.replace('NaN','');
+    }
+
+    // ======== INIT ========
+    (async function(){
+      // datas padrão (últimos 7 dias)
+      const today = new Date();
+      const weekAgo = new Date(Date.now() - 6*24*60*60*1000);
+      document.getElementById('to').value = today.toISOString().slice(0,10);
+      document.getElementById('from').value = weekAgo.toISOString().slice(0,10);
+
+      mountCharts();
+      await loadAttendants();
+      await refresh();
+
+      document.getElementById('apply').addEventListener('click', refresh);
+    })();
+  </script>
+</body>
+</html>
