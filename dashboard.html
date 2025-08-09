@@ -174,30 +174,36 @@
         setText("kpi-prom-trend", trendText(s.trend?.prom));
         setText("kpi-detr-trend", trendText(s.trend?.detr, true));
 
-        // BY ATTENDANT
-        const ba = (await apiGet(API.byAttendant, params)).data;
-        chartByAtt.updateOptions({
-          xaxis: { categories: ba.map((x) => x.attendant) },
+        // BY ATTENDANT (barras)
+        const params = collectFilters();
+        
+        const byAtt = await apiGet(API.byAttendant, params).catch(e => {
+          console.error('byAttendant fetch error', e);
+          return { data: [] };
         });
-        chartByAtt.updateSeries([{ name: "NPS", data: ba.map((x) => x.nps) }]);
-
-        // TIMESERIES
-        const ts = (await apiGet(API.timeseries, params)).data;
-        chartTimes.updateSeries([
-          {
-            name: "NPS",
-            data: ts.map((x) => ({ x: new Date(x.date).getTime(), y: x.nps })),
-          },
-        ]);
-
-        // DONUT
-        const prom = s.promoters || 0,
-          pass = s.passives || 0,
-          detr = s.detractors || 0;
+        console.log('byAttendant:', byAtt);
+        const ba = Array.isArray(byAtt.data) ? byAtt.data : [];
+        chartByAtt.updateOptions({ xaxis: { categories: ba.map(x => x.attendant || '—') } });
+        chartByAtt.updateSeries([{ name: 'NPS', data: ba.map(x => Number(x.nps) || 0) }]);
+        
+        // TIMESERIES (linha)
+        const time = await apiGet(API.timeseries, params).catch(e => {
+          console.error('timeseries fetch error', e);
+          return { data: [] };
+        });
+        console.log('timeseries:', time);
+        const ts = Array.isArray(time.data) ? time.data : [];
+        chartTimes.updateSeries([{
+          name: 'NPS',
+          data: ts.map(x => ({
+            x: new Date(x.date).getTime(),
+            y: Number(x.nps) || 0
+          }))
+        }]);
+        
+        // DONUT (usa o summary já carregado acima na sua função)
+        const prom = s.promoters || 0, pass = s.passives || 0, detr = s.detractors || 0;
         chartDonut.updateSeries([prom, pass, detr]);
-
-        document.getElementById("lastUpdate").textContent =
-          new Date().toLocaleString();
 
     }
 
@@ -223,7 +229,6 @@
       const weekAgo = new Date(Date.now() - 6*24*60*60*1000);
       document.getElementById('to').value = today.toISOString().slice(0,10);
       document.getElementById('from').value = weekAgo.toISOString().slice(0,10);
-
       
       await loadAttendants();
       mountCharts();      
