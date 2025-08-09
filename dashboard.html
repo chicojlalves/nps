@@ -186,6 +186,9 @@
         series:[0,0,0],
         dataLabels:{ enabled:true },
         legend:{ labels:{colors:'#cbd5e1'} },
+        colors: [getComputedStyle(document.documentElement).getPropertyValue('--ok').trim(),
+                 getComputedStyle(document.documentElement).getPropertyValue('--warn').trim(),
+                 getComputedStyle(document.documentElement).getPropertyValue('--bad').trim()],
         theme:{ mode:'dark' }
       });
       chartDonut.render();
