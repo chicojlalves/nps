@@ -91,30 +91,6 @@
       timeseries: 'https://webhook.franciscojlalves.com.br/webhook/nps/timeseries',
       attendants: 'https://webhook.franciscojlalves.com.br/webhook/nps/attendants',
       comments: 'https://webhook.franciscojlalves.com.br/webhook/nps/comments'
-    };
-
-    // Quando não houver endpoints ainda, usamos dados mockados
-    function mockDelay(ms){ return new Promise(r=>setTimeout(r,ms)); }
-    async function mockFetch(url, params){
-      await mockDelay(200);
-      if(url.includes('attendants')) return { data:["Ana","Carlos","João","Maria"] };
-      if(url.includes('summary')) return { data:{ nps: 62, total: 128, promoters: 72, passives: 34, detractors: 22, trend:{nps:+4,total:+12,prom:+5,detr:-3} } };
-      if(url.includes('by-attendant')) return { data:[
-        { attendant:"Ana", nps: 75, total: 30 },
-        { attendant:"Carlos", nps: 58, total: 26 },
-        { attendant:"João", nps: 66, total: 41 },
-        { attendant:"Maria", nps: 52, total: 31 }
-      ] };
-      if(url.includes('timeseries')) return { data:[
-        { date:"2025-08-01", nps:55, total:10 },
-        { date:"2025-08-02", nps:60, total:12 },
-        { date:"2025-08-03", nps:62, total:14 },
-        { date:"2025-08-04", nps:59, total:9 },
-        { date:"2025-08-05", nps:64, total:15 },
-        { date:"2025-08-06", nps:68, total:17 },
-        { date:"2025-08-07", nps:66, total:16 }
-      ] };
-      return { data: null };
     }
 
     async function apiGet(url, params){
@@ -299,7 +275,6 @@
       mountCharts();      
       await loadComments();
       await refresh();
-      
 
       document.getElementById('apply').addEventListener('click', refresh);
     })();
