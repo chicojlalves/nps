@@ -223,7 +223,13 @@
       
       // COMMENTS (se a tabela deve filtrar também)
       if (API.comments) await loadComments(params);
-      
+
+      // DONUT (usa o summary já carregado)
+      const prom = Number(s.promoters)  || 0;
+      const pass = Number(s.passives)   || 0;
+      const detr = Number(s.detractors) || 0;
+      chartDonut.updateSeries([prom, pass, detr]);
+       
       document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
     }
 
