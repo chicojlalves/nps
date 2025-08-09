@@ -220,6 +220,10 @@
 
     async function refresh(){
       const params = collectFilters();
+      await apiGet(API.summary, params);
+      await apiGet(API.byAttendant, params);
+      await apiGet(API.timeseries, params);
+      await apiGet(API.comments, params);
     
       try {
         // SUMMARY (KPIs)
