@@ -162,17 +162,6 @@
     }
 
     async function refresh(){
-        const params = collectFilters();
-        // SUMMARY
-        const s = (await apiGet(API.summary, params)).data;
-        setText("kpi-nps", fmtPct(s.nps));
-        setText("kpi-total", s.total);
-        setText("kpi-prom", s.promoters);
-        setText("kpi-detr", s.detractors);
-        setText("kpi-nps-trend", trendText(s.trend?.nps));
-        setText("kpi-total-trend", trendText(s.trend?.total));
-        setText("kpi-prom-trend", trendText(s.trend?.prom));
-        setText("kpi-detr-trend", trendText(s.trend?.detr, true));
 
         // BY ATTENDANT (barras)
         const params = collectFilters();
