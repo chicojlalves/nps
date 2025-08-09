@@ -266,7 +266,7 @@
         // TABELA DE COMENTÁRIOS (se você já usa params nela)
         await loadComments(params);
     
-        document.getElementById('lastUpdate')?.textContent = new Date().toLocaleString();
+        document.getElementById('lastUpdate')?.textContent == new Date().toLocaleString();
       } catch (err) {
         console.error('refresh error:', err);
       }
