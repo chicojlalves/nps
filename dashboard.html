@@ -33,6 +33,40 @@
     .kpi .trend.ok{color:var(--ok)} .kpi .trend.bad{color:var(--bad)}
     .chart{height:320px}
     .footer{opacity:.6; font-size:.8rem; margin:18px 0; text-align:center}
+
+        /* Caixa da tabela com barra de rolagem */
+    .table-wrapper {
+      max-height: 400px; /* ajusta a altura máxima */
+      overflow-y: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    
+    /* Cabeçalho fixo */
+    .table-wrapper table thead th {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, rgba(15,23,42,.95), rgba(15,23,42,.85));
+      backdrop-filter: saturate(120%) blur(4px);
+    }
+    
+    /* Linhas zebradas */
+    .table-wrapper tbody tr:nth-child(odd) {
+      background: rgba(255,255,255,.02);
+    }
+    
+    /* Bordas sutis */
+    .table-wrapper table td,
+    .table-wrapper table th {
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    
+    /* Espaçamento */
+    .table-wrapper table td,
+    .table-wrapper table th {
+      padding: 8px;
+    }
+
   </style>
 </head>
 <body>
@@ -66,18 +100,21 @@
 
     <section id="comments" style="margin-top:24px">
       <h3>Comentários recentes</h3>
-      <table style="width:100%; border-collapse:collapse">
-        <thead>
-          <tr style="text-align:left; border-bottom:1px solid #ddd">
-            <th style="padding:8px">Data/Hora</th>
-            <th style="padding:8px">Vendedor</th>
-            <th style="padding:8px">Nota</th>
-            <th style="padding:8px">Comentário</th>
-          </tr>
-        </thead>
-        <tbody id="tbl-body"></tbody>
-      </table>
+      <div class="table-wrapper">
+        <table style="width:100%; border-collapse:collapse">
+          <thead>
+            <tr style="text-align:left">
+              <th>Data/Hora</th>
+              <th>Vendedor</th>
+              <th>Nota</th>
+              <th>Comentário</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
+      </div>
     </section>
+
     
     <div class="footer">Atualizado: <span id="lastUpdate">–</span></div>
   </div>
