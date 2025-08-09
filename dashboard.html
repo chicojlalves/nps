@@ -184,31 +184,29 @@
       return d.toLocaleString('pt-BR', { hour12:false });
     }
     
-    async function loadComments(){
+    async function loadComments(params){
       try{
-        const { data } = await apiGet(API.comments);
+        const { data } = await apiGet(API.comments, params);
         const tbody = document.getElementById('tbl-body');
         if (!Array.isArray(data) || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#777">Sem comentários cadastrados</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#777">Sem comentários</td></tr>`;
           return;
         }
-        // opcional: limitar a, por ex., 100 mais recentes
         const rows = data.slice(0, 100);
         tbody.innerHTML = rows.map(r => `
           <tr style="border-bottom:1px solid #f0f0f0">
-            <td style="padding:8px">${fmtDateISOToLocal(r.timestamp)}</td>
+            <td style="padding:8px">${new Date(r.timestamp).toLocaleString('pt-BR',{hour12:false})}</td>
             <td style="padding:8px">${r.attendant}</td>
             <td style="padding:8px">${r.score}</td>
-            <td style="padding:8px">${r.comment.replace(/</g,'&lt;')}</td>
+            <td style="padding:8px">${String(r.comment).replace(/</g,'&lt;')}</td>
           </tr>
         `).join('');
       }catch(err){
         console.error('Erro ao carregar comentários', err);
-        const tbody = document.getElementById('tbl-body');
-        tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#c00">Erro ao carregar comentários</td></tr>`;
+        document.getElementById('tbl-body').innerHTML =
+          `<tr><td colspan="4" style="padding:8px;color:#c00">Erro ao carregar</td></tr>`;
       }
     }
-
 
     async function refresh(){
       // declare UMA vez
@@ -266,7 +264,7 @@
       
       await loadAttendants();
       mountCharts();      
-      await loadComments();
+      await loadComments(params);
       await refresh();
       
 
