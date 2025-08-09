@@ -67,6 +67,16 @@
       padding: 8px;
     }
 
+    /* cores de acordo com a nota NPS */
+    #tbl-body td.score {
+      font-weight: 700;
+      text-align: center;
+    }
+    
+    #tbl-body td.score.promotor { color: var(--ok); }   /* verde */
+    #tbl-body td.score.neutro { color: var(--warn); }   /* amarelo */
+    #tbl-body td.score.detrator { color: var(--bad); }  /* vermelho */
+
   </style>
 </head>
 <body>
@@ -218,20 +228,31 @@
           return Number.isFinite(d.getTime()) ? d.toLocaleString('pt-BR',{hour12:false}) : safe(iso);
         };
     
-        tbody.innerHTML = data.slice(0,100).map(r => `
-          <tr style="border-bottom:1px solid #f0f0f0">
-            <td style="padding:8px">${toLocal(r.timestamp)}</td>
-            <td style="padding:8px">${safe(r.attendant)}</td>
-            <td style="padding:8px">${Number.isFinite(Number(r.score)) ? Number(r.score) : '-'}</td>
-            <td style="padding:8px">${safe(r.comment)}</td>
-          </tr>
-        `).join('');
+        tbody.innerHTML = data.slice(0,100).map(r => {
+          const score = Number(r.score);
+          let cls = '';
+          if (score >= 9) cls = 'promotor';
+          else if (score >= 7) cls = 'neutro';
+          else if (score >= 0) cls = 'detrator';
+    
+          return `
+            <tr style="border-bottom:1px solid #f0f0f0">
+              <td style="padding:8px">${toLocal(r.timestamp)}</td>
+              <td style="padding:8px">${safe(r.attendant)}</td>
+              <td class="score ${cls}" style="padding:8px;text-align:center;font-weight:700">
+                ${Number.isFinite(score) ? score : '-'}
+              </td>
+              <td style="padding:8px">${safe(r.comment)}</td>
+            </tr>
+          `;
+        }).join('');
       }catch(e){
         console.error('comments error:', e);
         const tbody = document.getElementById('tbl-body');
         if (tbody) tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#c00">Erro ao carregar</td></tr>`;
       }
     }
+
 
 
      async function refresh(){
