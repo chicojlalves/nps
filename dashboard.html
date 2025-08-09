@@ -104,10 +104,9 @@
     async function apiGet(url, params){
       const qs = new URLSearchParams(params || {});
       const full = qs.toString() ? `${url}?${qs}` : url;
-    
-      const res = await fetch(full, { method:'GET' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json(); // espera { data: [...] }
+      const r = await fetch(full, { method:'GET' });
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json(); // espera { data: ... }
     }
 
     // ======== HELPERS ========
@@ -163,32 +162,22 @@
     }
 
     async function refresh(){
-      const params = collectFilters();
-      // SUMMARY
-      const s = (await apiGet(API.summary, params)).data;
-      setText('kpi-nps', fmtPct(s.nps));
-      setText('kpi-total', s.total);
-      setText('kpi-prom', s.promoters);
-      setText('kpi-detr', s.detractors);
-      setText('kpi-nps-trend', trendText(s.trend?.nps));
-      setText('kpi-total-trend', trendText(s.trend?.total));
-      setText('kpi-prom-trend', trendText(s.trend?.prom));
-      setText('kpi-detr-trend', trendText(s.trend?.detr, true));
-
-      // BY ATTENDANT
-      const ba = (await apiGet(API.byAttendant, params)).data;
+      // BY ATTENDANT (barras)
+      const ba = (await apiGet(API.byAttendant, collectFilters())).data || [];
       chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x=>x.attendant) } });
       chartByAtt.updateSeries([{ name:'NPS', data: ba.map(x=>x.nps) }]);
-
-      // TIMESERIES
-      const ts = (await apiGet(API.timeseries, params)).data;
-      chartTimes.updateSeries([{ name:'NPS', data: ts.map(x=>({ x: new Date(x.date).getTime(), y: x.nps })) }]);
-
-      // DONUT
+      
+      // TIMESERIES (linha)
+      const ts = (await apiGet(API.timeseries, collectFilters())).data || [];
+      chartTimes.updateSeries([{
+        name:'NPS',
+        data: ts.map(x => ({ x: new Date(x.date).getTime(), y: x.nps }))
+      }]);
+      
+      // DONUT (usa o summary já carregado)
       const prom = s.promoters || 0, pass = s.passives || 0, detr = s.detractors || 0;
       chartDonut.updateSeries([prom, pass, detr]);
 
-      document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
     }
 
     function collectFilters(){
