@@ -228,7 +228,7 @@
       try {
         // SUMMARY (KPIs)
         const sWrap = await apiGet(API.summary, params);
-        const s = (sWrap && typeof sWrap === 'object' && sWrap.data) ? sWrap.data : {};
+        const s = (sWrap && typeof sWrap == 'object' && sWrap.data) ? sWrap.data : {};
         const toPct = v => Number.isFinite(Number(v)) ? `${Math.round(Number(v))}%` : '–';
         const toNum = v => Number.isFinite(Number(v)) ? Number(v) : 0;
     
