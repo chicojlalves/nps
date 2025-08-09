@@ -74,14 +74,14 @@
       summary: '/api/mock/summary',
       byAttendant: '/api/mock/by-attendants',
       timeseries: '/api/mock/timeseries',
-      attendants: '/api/mock/attendants'
+      attendants: 'https://webhook.franciscojlalves.com.br/webhook/nps/attendants'
     };
 
     // Quando não houver endpoints ainda, usamos dados mockados
     function mockDelay(ms){ return new Promise(r=>setTimeout(r,ms)); }
     async function mockFetch(url, params){
       await mockDelay(200);
-      if(url.includes('attendants')) return { data:["Ana","Carlos","João","Maria"] };
+      // if(url.includes('attendants')) return { data:["Ana","Carlos","João","Maria"] };
       if(url.includes('summary')) return { data:{ nps: 62, total: 128, promoters: 72, passives: 34, detractors: 22, trend:{nps:+4,total:+12,prom:+5,detr:-3} } };
       if(url.includes('by-attendant')) return { data:[
         { attendant:"Ana", nps: 75, total: 30 },
