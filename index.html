@@ -62,11 +62,7 @@
       <form id="npsForm" novalidate>
         <label for="attendant">Quem te atendeu?</label>
         <select id="attendant" required>
-          <option value="" selected disabled>Selecione…</option>
-          <option>João</option>
-          <option>Maria</option>
-          <option>Ana</option>
-          <option>Carlos</option>
+          <option value="" selected disabled>Carregando…</option>
         </select>
         <label>Nota (0–10)</label>
         <div class="scale" id="scoreScale" aria-label="Nota NPS">
@@ -86,6 +82,32 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
+    const API = {
+      attendants: 'https://webhook.franciscojlalves.com.br/webhook/nps/attendants',
+    };
+
+    // busca os vendedores
+    async function loadAttendants(){
+      try{
+        const { data } = await apiGet(API.attendants);
+        const sel = document.getElementById('attendant');
+        sel.innerHTML = '<option value="">Selecione…</option>' +
+          (data || []).map(n => `<option>${String(n)}</option>`).join('');
+      }catch(e){
+        console.error('Erro ao carregar vendedores', e);
+        document.getElementById('attendant').innerHTML =
+          '<option value="" selected disabled>Erro ao carregar</option>';
+      }
+    }
+
+    async function apiGet(url, params){
+      const qs = new URLSearchParams(params || {});
+      const full = qs.toString() ? `${url}?${qs}` : url;
+      const res = await fetch(full, { method:'GET' });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json(); // espera { data: [...] }
+    }
+    
     // monta botões da escala 0..10
     const scale = document.getElementById('scoreScale');
     for (let i=0;i<=10;i++){
@@ -158,6 +180,12 @@
         toast('Ops! Tente novamente em instantes.');
       }
     });
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadAttendants);
+    } else {
+      loadAttendants();
+    }
   </script>
 </body>
 </html>
