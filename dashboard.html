@@ -272,13 +272,12 @@
       }
     }
 
-
     function collectFilters(){
-      const from = document.getElementById('from').value;
-      const to = document.getElementById('to').value;
-      const att = document.getElementById('attendant').value;
-      const ch = document.getElementById('channel').value;
-      return { from, to, attendant: att, channel: ch };
+      return {
+        from: document.getElementById('from').value,
+        to:   document.getElementById('to').value,
+        attendant: document.getElementById('attendant').value
+      };
     }
 
     function trendText(v, invert){
