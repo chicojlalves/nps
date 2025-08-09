@@ -87,7 +87,7 @@
     // Substitua estes endpoints pelos do seu n8n quando prontos
     const API = {
       summary: 'https://webhook.franciscojlalves.com.br/webhook/nps/summary',
-      byAttendant: 'https://webhook.franciscojlalves.com.br/webhook/nps/by-attendants',
+      byAttendant: 'https://webhook.franciscojlalves.com.br/webhook/nps/by-attendant',
       timeseries: 'https://webhook.franciscojlalves.com.br/webhook/nps/timeseries',
       attendants: 'https://webhook.franciscojlalves.com.br/webhook/nps/attendants',
       comments: 'https://webhook.franciscojlalves.com.br/webhook/nps/comments'
@@ -234,12 +234,7 @@
       const att  = (document.getElementById('attendant').value || '').trim();
       return { from, to, attendant: att || undefined };
     }
-    
-    // se o botão está dentro de <form>, previna submit
-    document.getElementById('apply').addEventListener('click', (e)=>{
-      e.preventDefault?.();
-      refresh(); // não use outra função aqui
-    });
+
 
     function trendText(v, invert){
       if(v==null) return '';
@@ -255,14 +250,22 @@
       const weekAgo = new Date(Date.now() - 6*24*60*60*1000);
       document.getElementById('to').value = today.toISOString().slice(0,10);
       document.getElementById('from').value = weekAgo.toISOString().slice(0,10);
-      
+    
       await loadAttendants();
-      mountCharts();      
-      await loadComments();
+      mountCharts();
+    
+      // 1ª atualização já com filtros aplicados
       await refresh();
-
-      document.getElementById('apply').addEventListener('click', refresh);
+    
+      // um único listener no botão
+      const applyBtn = document.getElementById('apply');
+      applyBtn.type = 'button'; // garante que não submeta form
+      applyBtn.addEventListener('click', (e)=>{
+        e.preventDefault?.();
+        refresh();
+      });
     })();
+
   </script>
 </body>
 </html>
