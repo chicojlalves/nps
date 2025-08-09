@@ -81,7 +81,7 @@
     function mockDelay(ms){ return new Promise(r=>setTimeout(r,ms)); }
     async function mockFetch(url, params){
       await mockDelay(200);
-       if(url.includes('attendants')) return { data:["Ana","Carlos","João","Maria"] };
+      if(url.includes('attendants')) return { data:["Ana","Carlos","João","Maria"] };
       if(url.includes('summary')) return { data:{ nps: 62, total: 128, promoters: 72, passives: 34, detractors: 22, trend:{nps:+4,total:+12,prom:+5,detr:-3} } };
       if(url.includes('by-attendant')) return { data:[
         { attendant:"Ana", nps: 75, total: 30 },
@@ -214,8 +214,9 @@
       document.getElementById('to').value = today.toISOString().slice(0,10);
       document.getElementById('from').value = weekAgo.toISOString().slice(0,10);
 
-      mountCharts();
+      
       await loadAttendants();
+      mountCharts();      
       await refresh();
 
       document.getElementById('apply').addEventListener('click', refresh);
