@@ -162,38 +162,34 @@
     }
 
     async function refresh(){
-
-        // BY ATTENDANT (barras)
-        const params = collectFilters();
-        
-        const byAtt = await apiGet(API.byAttendant, params).catch(e => {
-          console.error('byAttendant fetch error', e);
-          return { data: [] };
-        });
-        console.log('byAttendant:', byAtt);
-        const ba = Array.isArray(byAtt.data) ? byAtt.data : [];
-        chartByAtt.updateOptions({ xaxis: { categories: ba.map(x => x.attendant || '—') } });
-        chartByAtt.updateSeries([{ name: 'NPS', data: ba.map(x => Number(x.nps) || 0) }]);
-        
-        // TIMESERIES (linha)
-        const time = await apiGet(API.timeseries, params).catch(e => {
-          console.error('timeseries fetch error', e);
-          return { data: [] };
-        });
-        console.log('timeseries:', time);
-        const ts = Array.isArray(time.data) ? time.data : [];
-        chartTimes.updateSeries([{
-          name: 'NPS',
-          data: ts.map(x => ({
-            x: new Date(x.date).getTime(),
-            y: Number(x.nps) || 0
-          }))
-        }]);
-        
-        // DONUT (usa o summary já carregado acima na sua função)
-        const prom = s.promoters || 0, pass = s.passives || 0, detr = s.detractors || 0;
-        chartDonut.updateSeries([prom, pass, detr]);
-
+      // declare UMA vez
+      const params = collectFilters();
+    
+      // SUMMARY (KPIs)
+      const s = (await apiGet(API.summary, params)).data || {};
+      document.getElementById('kpi-nps').textContent   = Number.isFinite(s.nps) ? `${Math.round(s.nps)}%` : '–';
+      document.getElementById('kpi-total').textContent = s.total ?? '–';
+      document.getElementById('kpi-prom').textContent  = s.promoters ?? '–';
+      document.getElementById('kpi-detr').textContent  = s.detractors ?? '–';
+    
+      // BY ATTENDANT (barras)
+      const byAtt = await apiGet(API.byAttendant, params).catch(e => ({ data: [] }));
+      const ba = Array.isArray(byAtt.data) ? byAtt.data : [];
+      chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x=>x.attendant || '—') } });
+      chartByAtt.updateSeries([{ name:'NPS', data: ba.map(x=>Number(x.nps)||0) }]);
+    
+      // TIMESERIES (linha)
+      const time = await apiGet(API.timeseries, params).catch(e => ({ data: [] }));
+      const ts = Array.isArray(time.data) ? time.data : [];
+      chartTimes.updateSeries([{
+        name: 'NPS',
+        data: ts.map(x => ({ x: new Date(x.date).getTime(), y: Number(x.nps)||0 }))
+      }]);
+    
+      // DONUT
+      chartDonut.updateSeries([s.promoters||0, s.passives||0, s.detractors||0]);
+    
+      document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
     }
 
     function collectFilters(){
