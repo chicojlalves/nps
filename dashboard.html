@@ -266,8 +266,9 @@
       
       await loadAttendants();
       mountCharts();      
-      await refresh();
       await loadComments();
+      await refresh();
+      
 
       document.getElementById('apply').addEventListener('click', refresh);
     })();
