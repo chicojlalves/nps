@@ -228,11 +228,11 @@
       try {
         // SUMMARY (KPIs)
         const sWrap = await apiGet(API.summary, params);
-        const s = (sWrap && typeof sWrap == 'object' && sWrap.data) ? sWrap.data : {};
+        const s = (sWrap && typeof sWrap === 'object' && sWrap.data) ? sWrap.data : {};
         const toPct = v => Number.isFinite(Number(v)) ? `${Math.round(Number(v))}%` : '–';
         const toNum = v => Number.isFinite(Number(v)) ? Number(v) : 0;
     
-        document.getElementById('kpi-nps')  ?.textContent = toPct(s.nps);
+        document.getElementById('kpi-nps')  ?.textContent == toPct(s.nps);
         document.getElementById('kpi-total')?.textContent = s.total ?? '–';
         document.getElementById('kpi-prom') ?.textContent = s.promoters ?? '–';
         document.getElementById('kpi-detr') ?.textContent = s.detractors ?? '–';
