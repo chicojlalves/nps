@@ -64,6 +64,21 @@
       <div class="card"><div id="chartDonut" class="chart"></div></div>
     </section>
 
+    <section id="comments" style="margin-top:24px">
+      <h3>Comentários recentes</h3>
+      <table style="width:100%; border-collapse:collapse">
+        <thead>
+          <tr style="text-align:left; border-bottom:1px solid #ddd">
+            <th style="padding:8px">Data/Hora</th>
+            <th style="padding:8px">Vendedor</th>
+            <th style="padding:8px">Nota</th>
+            <th style="padding:8px">Comentário</th>
+          </tr>
+        </thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+    </section>
+    
     <div class="footer">Atualizado: <span id="lastUpdate">–</span></div>
   </div>
 
@@ -74,7 +89,8 @@
       summary: 'https://webhook.franciscojlalves.com.br/webhook/nps/summary',
       byAttendant: 'https://webhook.franciscojlalves.com.br/webhook/nps/by-attendants',
       timeseries: 'https://webhook.franciscojlalves.com.br/webhook/nps/timeseries',
-      attendants: 'https://webhook.franciscojlalves.com.br/webhook/nps/attendants'
+      attendants: 'https://webhook.franciscojlalves.com.br/webhook/nps/attendants',
+      comments: 'https://webhook.franciscojlalves.com.br/webhook/nps/comments'
     };
 
     // Quando não houver endpoints ainda, usamos dados mockados
@@ -161,6 +177,39 @@
         }
     }
 
+    function fmtDateISOToLocal(iso){
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return iso;
+      // mostra no fuso local, pt-BR
+      return d.toLocaleString('pt-BR', { hour12:false });
+    }
+    
+    async function loadComments(){
+      try{
+        const { data } = await apiGet(API.comments);
+        const tbody = document.getElementById('tbl-body');
+        if (!Array.isArray(data) || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#777">Sem comentários cadastrados</td></tr>`;
+          return;
+        }
+        // opcional: limitar a, por ex., 100 mais recentes
+        const rows = data.slice(0, 100);
+        tbody.innerHTML = rows.map(r => `
+          <tr style="border-bottom:1px solid #f0f0f0">
+            <td style="padding:8px">${fmtDateISOToLocal(r.timestamp)}</td>
+            <td style="padding:8px">${r.attendant}</td>
+            <td style="padding:8px">${r.score}</td>
+            <td style="padding:8px">${r.comment.replace(/</g,'&lt;')}</td>
+          </tr>
+        `).join('');
+      }catch(err){
+        console.error('Erro ao carregar comentários', err);
+        const tbody = document.getElementById('tbl-body');
+        tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#c00">Erro ao carregar comentários</td></tr>`;
+      }
+    }
+
+
     async function refresh(){
       // declare UMA vez
       const params = collectFilters();
@@ -218,6 +267,7 @@
       await loadAttendants();
       mountCharts();      
       await refresh();
+      await loadComments();
 
       document.getElementById('apply').addEventListener('click', refresh);
     })();
