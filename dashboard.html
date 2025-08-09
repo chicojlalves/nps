@@ -186,58 +186,88 @@
     
     async function loadComments(params){
       try{
-        const { data } = await apiGet(API.comments, params);
+        const res = await apiGet(API.comments, params);
+        const data = Array.isArray(res?.data) ? res.data : [];
         const tbody = document.getElementById('tbl-body');
-        if (!Array.isArray(data) || data.length === 0) {
+        if (!tbody) return;
+    
+        if (data.length === 0) {
           tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#777">Sem comentários</td></tr>`;
           return;
         }
-        const rows = data.slice(0, 100);
-        tbody.innerHTML = rows.map(r => `
+    
+        const safe = s => String(s ?? '').replace(/</g,'&lt;');
+        const toLocal = iso => {
+          const d = new Date(iso);
+          return Number.isFinite(d.getTime()) ? d.toLocaleString('pt-BR',{hour12:false}) : safe(iso);
+        };
+    
+        tbody.innerHTML = data.slice(0,100).map(r => `
           <tr style="border-bottom:1px solid #f0f0f0">
-            <td style="padding:8px">${new Date(r.timestamp).toLocaleString('pt-BR',{hour12:false})}</td>
-            <td style="padding:8px">${r.attendant}</td>
-            <td style="padding:8px">${r.score}</td>
-            <td style="padding:8px">${String(r.comment).replace(/</g,'&lt;')}</td>
+            <td style="padding:8px">${toLocal(r.timestamp)}</td>
+            <td style="padding:8px">${safe(r.attendant)}</td>
+            <td style="padding:8px">${Number.isFinite(Number(r.score)) ? Number(r.score) : '-'}</td>
+            <td style="padding:8px">${safe(r.comment)}</td>
           </tr>
         `).join('');
-      }catch(err){
-        console.error('Erro ao carregar comentários', err);
-        document.getElementById('tbl-body').innerHTML =
-          `<tr><td colspan="4" style="padding:8px;color:#c00">Erro ao carregar</td></tr>`;
+      }catch(e){
+        console.error('comments error:', e);
+        const tbody = document.getElementById('tbl-body');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#c00">Erro ao carregar</td></tr>`;
       }
     }
 
+
     async function refresh(){
-      // declare UMA vez
       const params = collectFilters();
     
-      // SUMMARY (KPIs)
-      const s = (await apiGet(API.summary, params)).data || {};
-      document.getElementById('kpi-nps').textContent   = Number.isFinite(s.nps) ? `${Math.round(s.nps)}%` : '–';
-      document.getElementById('kpi-total').textContent = s.total ?? '–';
-      document.getElementById('kpi-prom').textContent  = s.promoters ?? '–';
-      document.getElementById('kpi-detr').textContent  = s.detractors ?? '–';
+      try {
+        // SUMMARY (KPIs)
+        const sWrap = await apiGet(API.summary, params);
+        const s = (sWrap && typeof sWrap === 'object' && sWrap.data) ? sWrap.data : {};
+        const toPct = v => Number.isFinite(Number(v)) ? `${Math.round(Number(v))}%` : '–';
+        const toNum = v => Number.isFinite(Number(v)) ? Number(v) : 0;
     
-      // BY ATTENDANT (barras)
-      const byAtt = await apiGet(API.byAttendant, params).catch(e => ({ data: [] }));
-      const ba = Array.isArray(byAtt.data) ? byAtt.data : [];
-      chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x=>x.attendant || '—') } });
-      chartByAtt.updateSeries([{ name:'NPS', data: ba.map(x=>Number(x.nps)||0) }]);
+        document.getElementById('kpi-nps')  ?.textContent = toPct(s.nps);
+        document.getElementById('kpi-total')?.textContent = s.total ?? '–';
+        document.getElementById('kpi-prom') ?.textContent = s.promoters ?? '–';
+        document.getElementById('kpi-detr') ?.textContent = s.detractors ?? '–';
     
-      // TIMESERIES (linha)
-      const time = await apiGet(API.timeseries, params).catch(e => ({ data: [] }));
-      const ts = Array.isArray(time.data) ? time.data : [];
-      chartTimes.updateSeries([{
-        name: 'NPS',
-        data: ts.map(x => ({ x: new Date(x.date).getTime(), y: Number(x.nps)||0 }))
-      }]);
+        const trendTxt = v => (v==null?'':`${v>0?'+':''}${v}`);
+        document.getElementById('kpi-nps-trend')  ?.textContent = trendTxt(Number(s.trend?.nps));
+        document.getElementById('kpi-total-trend')?.textContent = trendTxt(Number(s.trend?.total));
+        document.getElementById('kpi-prom-trend') ?.textContent = trendTxt(Number(s.trend?.prom));
+        document.getElementById('kpi-detr-trend') ?.textContent = trendTxt(Number(s.trend?.detr));
     
-      // DONUT
-      chartDonut.updateSeries([s.promoters||0, s.passives||0, s.detractors||0]);
+        // BY ATTENDANT (barras)
+        const baWrap = await apiGet(API.byAttendant, params);
+        const ba = Array.isArray(baWrap?.data) ? baWrap.data : [];
+        chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x => String(x.attendant ?? '—')) } });
+        chartByAtt.updateSeries([{ name:'NPS', data: ba.map(x => toNum(x.nps)) }]);
     
-      document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+        // TIMESERIES (linha)
+        const tsWrap = await apiGet(API.timeseries, params);
+        const ts = Array.isArray(tsWrap?.data) ? tsWrap.data : [];
+        const toPoint = x => {
+          const t = new Date(x.date);
+          const y = toNum(x.nps);
+          return Number.isFinite(t.getTime()) ? { x: t.getTime(), y } : null;
+        };
+        const series = ts.map(toPoint).filter(Boolean);
+        chartTimes.updateSeries([{ name:'NPS', data: series }]);
+    
+        // DONUT
+        chartDonut.updateSeries([ toNum(s.promoters), toNum(s.passives), toNum(s.detractors) ]);
+    
+        // TABELA DE COMENTÁRIOS (se você já usa params nela)
+        await loadComments(params);
+    
+        document.getElementById('lastUpdate')?.textContent = new Date().toLocaleString();
+      } catch (err) {
+        console.error('refresh error:', err);
+      }
     }
+
 
     function collectFilters(){
       const from = document.getElementById('from').value;
