@@ -102,8 +102,12 @@
     }
 
     async function apiGet(url, params){
-      // Troque mockFetch por fetch(url) quando tiver endpoint de verdade.
-      return mockFetch(url, params);
+      const qs = new URLSearchParams(params || {});
+      const full = qs.toString() ? `${url}?${qs}` : url;
+    
+      const res = await fetch(full, { method:'GET' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json(); // espera { data: [...] }
     }
 
     // ======== HELPERS ========
@@ -148,9 +152,14 @@
 
     // ======== LOAD / UPDATE ========
     async function loadAttendants(){
-      const { data } = await apiGet(API.attendants);
-      const sel = document.getElementById('attendant');
-      sel.innerHTML = '<option value="">Todos</option>' + data.map(a=>`<option>${a}</option>`).join('');
+        try{
+          const { data } = await apiGet(API.attendants);
+          const sel = document.getElementById('attendant');
+          sel.innerHTML = '<option value="">Todos</option>' +
+            (data || []).map(a => `<option>${a}</option>`).join('');
+        }catch(err){
+          console.error('Erro ao carregar vendedores:', err);
+        }
     }
 
     async function refresh(){
