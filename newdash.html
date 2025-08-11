@@ -304,7 +304,7 @@
       document.getElementById('to').value = today.toISOString().slice(0,10);
       document.getElementById('from').value = weekAgo.toISOString().slice(0,10);
     
-      await loadAttendants(all.attendants);
+      await loadAttendants();
       mountCharts();
     
       // 1ª atualização já com filtros aplicados
