@@ -1,1 +1,324 @@
-const API = { dashboard: 'https://SEU-DOMINIO/webhook/nps/dashboard' };
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Pesquisa de Satisfação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <style>
+    :root{
+      --bg:#0b1021; --panel:#0f172a; --muted:#94a3b8; --text:#e5e7eb; --brand:#22d3ee; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial; background:linear-gradient(120deg,#0b1021,#0f172a); color:var(--text)}
+    .wrap{max-width:1180px; margin:24px auto; padding:0 16px}
+    header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px}
+    h1{margin:0; font-size:1.6rem}
+    .filters{display:flex; flex-wrap:wrap; gap:10px; align-items:end}
+    .field{display:flex; flex-direction:column; gap:6px}
+    .field label{font-size:.85rem; color:var(--muted)}
+    .field input,.field select, .btn{background:#0b1224; color:var(--text); border:1px solid rgba(255,255,255,.1); border-radius:10px; padding:.6rem .75rem}
+    .btn{cursor:pointer; font-weight:700}
+    .grid{display:grid; gap:14px}
+    @media (min-width: 920px){ .grid.cols-4{grid-template-columns:repeat(4,1fr)} }
+    @media (min-width: 920px){ .grid.cols-2{grid-template-columns:repeat(2,1fr)} }
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .kpi{display:flex; flex-direction:column; gap:2px}
+    .kpi .label{font-size:.8rem; color:var(--muted)}
+    .kpi .value{font-size:1.8rem; font-weight:800}
+    .kpi .trend{font-size:.8rem}
+    .kpi .trend.ok{color:var(--ok)} .kpi .trend.bad{color:var(--bad)}
+    .chart{height:320px}
+    .footer{opacity:.6; font-size:.8rem; margin:18px 0; text-align:center}
+
+        /* Caixa da tabela com barra de rolagem */
+    .table-wrapper {
+      max-height: 400px; /* ajusta a altura máxima */
+      overflow-y: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    
+    /* Cabeçalho fixo */
+    .table-wrapper table thead th {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, rgba(15,23,42,.95), rgba(15,23,42,.85));
+      backdrop-filter: saturate(120%) blur(4px);
+    }
+    
+    /* Linhas zebradas */
+    .table-wrapper tbody tr:nth-child(odd) {
+      background: rgba(255,255,255,.02);
+    }
+    
+    /* Bordas sutis */
+    .table-wrapper table td,
+    .table-wrapper table th {
+      border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+    
+    /* Espaçamento */
+    .table-wrapper table td,
+    .table-wrapper table th {
+      padding: 8px;
+    }
+
+    /* cores de acordo com a nota NPS */
+    #tbl-body td.score {
+      font-weight: 700;
+      text-align: center;
+    }
+    
+    #tbl-body td.score.promotor { color: var(--ok); }   /* verde */
+    #tbl-body td.score.neutro { color: var(--warn); }   /* amarelo */
+    #tbl-body td.score.detrator { color: var(--bad); }  /* vermelho */
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Dashboard Pesquisa de Satisfação</h1>
+      <div class="filters">
+        <div class="field"><label>De</label><input type="date" id="from"></div>
+        <div class="field"><label>Até</label><input type="date" id="to"></div>
+        <div class="field"><label>Atendente</label><select id="attendant"><option value="">Todos</option></select></div>
+        <div class="field"><label>Loja</label><select id="channel"><option value="">Todos</option></select></div>
+        <button class="btn" id="apply">Aplicar</button>
+      </div>
+    </header>
+
+    <section class="grid cols-4">
+      <div class="card kpi"><div class="label">NPS Geral</div><div class="value" id="kpi-nps">–</div><div class="trend" id="kpi-nps-trend"></div></div>
+      <div class="card kpi"><div class="label">Respostas</div><div class="value" id="kpi-total">–</div><div class="trend" id="kpi-total-trend"></div></div>
+      <div class="card kpi"><div class="label">Promotores</div><div class="value" id="kpi-prom">–</div><div class="trend" id="kpi-prom-trend"></div></div>
+      <div class="card kpi"><div class="label">Detratores</div><div class="value" id="kpi-detr">–</div><div class="trend" id="kpi-detr-trend"></div></div>
+    </section>
+
+    <section class="grid cols-2" style="margin-top:14px">
+      <div class="card"><div id="chartByAtt" class="chart"></div></div>
+      <div class="card"><div id="chartTimeseries" class="chart"></div></div>
+    </section>
+
+    <section style="margin-top:14px">
+      <div class="card"><div id="chartDonut" class="chart"></div></div>
+    </section>
+
+    <section id="comments" style="margin-top:24px">
+      <div class="table-wrapper">
+        <table style="width:100%; border-collapse:collapse">
+          <thead>
+            <tr style="text-align:left">
+              <th>Data/Hora</th>
+              <th>Vendedor</th>
+              <th>Nota</th>
+              <th>Comentário</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
+      </div>
+    </section>
+    
+    <div class="footer">Atualizado: <span id="lastUpdate">–</span></div>
+  </div>
+
+  <script>
+    // ======== CONFIG ========
+    // Substitua estes endpoints pelos do seu n8n quando prontos
+    const API = {
+      dashboard: 'https://webhook.franciscojlalves.com.br/webhook/nps/dashboard',
+    }
+
+    async function apiGet(url, params){
+      const qs = new URLSearchParams();
+      if (params?.from) qs.append('from', params.from);
+      if (params?.to) qs.append('to', params.to);
+      if (params?.attendant) qs.append('attendant', params.attendant.trim());
+      const full = qs.toString() ? `${url}?${qs}` : url;
+    
+      const res = await fetch(full, { method:'GET', cache:'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json(); // espera { data: ... }
+    }
+
+    // ======== HELPERS ========
+    function fmtPct(n){ return (n==null||isNaN(n)) ? '–' : `${Math.round(n)}%`; }
+    function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent = val; }
+
+    // ======== CHARTS ========
+    let chartByAtt, chartTimes, chartDonut;
+    function mountCharts(){
+      chartByAtt = new ApexCharts(document.querySelector('#chartByAtt'), {
+        chart:{ type:'bar', height:320, toolbar:{show:false}, animations:{enabled:true} },
+        series:[{ name:'NPS', data:[] }],
+        xaxis:{ categories:[], labels:{style:{colors:'#cbd5e1'}} },
+        yaxis:{ labels:{style:{colors:'#cbd5e1'}}, max:100 },
+        dataLabels:{ enabled:true },
+        grid:{ borderColor:'rgba(255,255,255,.08)' },
+        theme:{ mode:'dark' }
+      });
+      chartByAtt.render();
+
+      chartTimes = new ApexCharts(document.querySelector('#chartTimeseries'), {
+        chart:{ type:'line', height:320, toolbar:{show:false}, animations:{enabled:true} },
+        series:[{ name:'NPS', data:[] }],
+        xaxis:{ type:'datetime', labels:{style:{colors:'#cbd5e1'}} },
+        yaxis:{ labels:{style:{colors:'#cbd5e1'}}, max:100 },
+        stroke:{ width:3 },
+        grid:{ borderColor:'rgba(255,255,255,.08)' },
+        theme:{ mode:'dark' }
+      });
+      chartTimes.render();
+
+      chartDonut = new ApexCharts(document.querySelector('#chartDonut'), {
+        chart:{ type:'donut', height:320 },
+        labels:['Promotores','Neutros','Detratores'],
+        series:[0,0,0],
+        dataLabels:{ enabled:true },
+        legend:{ labels:{colors:'#cbd5e1'} },
+        colors: [getComputedStyle(document.documentElement).getPropertyValue('--ok').trim(),
+                 getComputedStyle(document.documentElement).getPropertyValue('--warn').trim(),
+                 getComputedStyle(document.documentElement).getPropertyValue('--bad').trim()],
+        theme:{ mode:'dark' }
+      });
+      chartDonut.render();
+    }
+
+    // ======== LOAD / UPDATE ========
+    async function loadAttendants(){
+        try{
+          const { data } = await apiGet(API.attendants);
+          const sel = document.getElementById('attendant');
+          sel.innerHTML = '<option value="">Todos</option>' +
+            (data || []).map(a => `<option>${a}</option>`).join('');
+        }catch(err){
+          console.error('Erro ao carregar vendedores:', err);
+        }
+    }
+
+    function fmtDateISOToLocal(iso){
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return iso;
+      // mostra no fuso local, pt-BR
+      return d.toLocaleString('pt-BR', { hour12:false });
+    }
+    
+    async function loadComments(params){
+      try{
+        const res = await apiGet(API.comments, params);
+        const data = Array.isArray(res?.data) ? res.data : [];
+        const tbody = document.getElementById('tbl-body');
+        if (!tbody) return;
+    
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#777">Sem comentários</td></tr>`;
+          return;
+        }
+    
+        const safe = s => String(s ?? '').replace(/</g,'&lt;');
+        const toLocal = iso => {
+          const d = new Date(iso);
+          return Number.isFinite(d.getTime()) ? d.toLocaleString('pt-BR',{hour12:false}) : safe(iso);
+        };
+    
+        tbody.innerHTML = data.slice(0,100).map(r => {
+          const score = Number(r.score);
+          let cls = '';
+          if (score >= 9) cls = 'promotor';
+          else if (score >= 7) cls = 'neutro';
+          else if (score >= 0) cls = 'detrator';
+    
+          return `
+            <tr style="border-bottom:1px solid #f0f0f0">
+              <td style="padding:8px">${toLocal(r.timestamp)}</td>
+              <td style="padding:8px">${safe(r.attendant)}</td>
+              <td class="score ${cls}" style="padding:8px;text-align:center;font-weight:700">
+                ${Number.isFinite(score) ? score : '-'}
+              </td>
+              <td style="padding:8px">${safe(r.comment)}</td>
+            </tr>
+          `;
+        }).join('');
+      }catch(e){
+        console.error('comments error:', e);
+        const tbody = document.getElementById('tbl-body');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#c00">Erro ao carregar</td></tr>`;
+      }
+    }
+
+
+
+     async function refresh(){
+      const params = collectFilters();
+      const all = (await apiGet(API.dashboard, params)).data || {};
+      const s  = all.summary || {};
+      const ba = all.byAttendant || [];
+      const ts = all.timeseries || [];
+      const cm = all.comments || [];
+      
+      // KPIs
+      // ... (usa s)
+      
+      // Gráfico por atendente
+      chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x=>x.attendant) }});
+      chartByAtt.updateSeries([{ name:'NPS', data: ba.map(x=>x.nps) }]);
+      
+      // Timeseries
+      chartTimes.updateSeries([{ name:'NPS', data: ts.map(x=>({ x:new Date(x.date).getTime(), y:x.nps })) }]);
+      
+      // Donut
+      chartDonut.updateSeries([s.promoters||0, s.passives||0, s.detractors||0]);
+      
+      // Tabela
+      render comments com cm (ou use seu loadComments(cm))
+
+      document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+    }
+
+
+    function collectFilters(){
+      const from = document.getElementById('from').value;
+      const to   = document.getElementById('to').value;
+      const att  = (document.getElementById('attendant').value || '').trim();
+      return { from, to, attendant: att || undefined };
+    }
+
+
+    function trendText(v, invert){
+      if(v==null) return '';
+      const sign = v>0 ? '+' : '';
+      const cls = (invert? -v : v) >= 0 ? 'ok' : 'bad';
+      return `${sign}${v}${typeof v==='number'?'':''}`.replace('NaN','');
+    }
+
+    // ======== INIT ========
+    (async function(){
+      // datas padrão (últimos 7 dias)
+      const today = new Date();
+      const weekAgo = new Date(Date.now() - 6*24*60*60*1000);
+      document.getElementById('to').value = today.toISOString().slice(0,10);
+      document.getElementById('from').value = weekAgo.toISOString().slice(0,10);
+    
+      await loadAttendants(all.attendants);
+      mountCharts();
+    
+      // 1ª atualização já com filtros aplicados
+      await refresh();
+    
+      // um único listener no botão
+      const applyBtn = document.getElementById('apply');
+      applyBtn.type = 'button'; // garante que não submeta form
+      applyBtn.addEventListener('click', (e)=>{
+        e.preventDefault?.();
+        refresh();
+      });
+    })();
+
+  </script>
+</body>
+</html>
