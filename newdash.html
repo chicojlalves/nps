@@ -192,7 +192,7 @@
     // ======== LOAD / UPDATE ========
     async function loadAttendants(){
         try{
-          const { data } = all;
+          const { data } = await apiGet(API.dashboard, params);
           const sel = document.getElementById('attendant');
           sel.innerHTML = '<option value="">Todos</option>' +
             (data.attendants || []).map(a => `<option>${a}</option>`).join('');
