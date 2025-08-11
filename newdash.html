@@ -195,7 +195,7 @@
           const { data } = await apiGet(API.dashboard);
           const sel = document.getElementById('attendant');
           sel.innerHTML = '<option value="">Todos</option>' +
-            (data || []).map(a => `<option>${a}</option>`).join('');
+            (data.attendants || []).map(a => `<option>${a}</option>`).join('');
         }catch(err){
           console.error('Erro ao carregar vendedores:', err);
         }
@@ -211,7 +211,7 @@
     async function loadComments(params){
       try{
         const res = await apiGet(API.dashboard, params);
-        const data = Array.isArray(res?.data) ? res.data : [];
+        const data = Array.isArray(res?.data.comments) ? res.data.comments : [];
         const tbody = document.getElementById('tbl-body');
         if (!tbody) return;
     
