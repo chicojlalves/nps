@@ -210,7 +210,7 @@
     
     async function loadComments(params){
       try{
-        const res = await apiGet(API.dashboard, params);
+        const res = all
         const data = Array.isArray(res?.data.comments) ? res.data.comments : [];
         const tbody = document.getElementById('tbl-body');
         if (!tbody) return;
@@ -298,6 +298,14 @@
 
     // ======== INIT ========
     (async function(){
+
+      const params = collectFilters();
+      const all = (await apiGet(API.dashboard, params)).data || {};
+      const s  = all.summary || {};
+      const ba = all.byAttendant || [];
+      const ts = all.timeseries || [];
+      const cm = all.comments || [];
+      
       // datas padrão (últimos 7 dias)
       const today = new Date();
       const weekAgo = new Date(Date.now() - 6*24*60*60*1000);
