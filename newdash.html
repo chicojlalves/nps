@@ -212,7 +212,7 @@
       try{
         //const res = await apiGet(API.dashboard, params);
         const res = params;
-        const data = Array.isArray(res?.data.comments) ? res.data.comments : [];
+        const data = Array.isArray(res?.comments) ? res.comments : [];
         const tbody = document.getElementById('tbl-body');
         if (!tbody) return;
     
