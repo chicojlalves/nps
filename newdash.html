@@ -190,21 +190,9 @@
     }
 
     // ======== LOAD / UPDATE ========
-    //async function loadAttendants(){
-      //  try{
-        // const { data } = await apiGet(API.dashboard);
-        // const sel = document.getElementById('attendant');
-        // sel.innerHTML = '<option value="">Todos</option>' +
-       //     (data.attendants || []).map(a => `<option>${a}</option>`).join('');
-        //}catch(err){
-         // console.error('Erro ao carregar vendedores:', err);
-        //}
-    //}
     async function loadAttendants(att){
         try{
-          //const { data } = await apiGet(API.dashboard);
-          data = att
-          console.log(att + " - " + data)
+          data = att;
           const sel = document.getElementById('attendant');
           sel.innerHTML = '<option value="">Todos</option>' +
             (data.attendants || []).map(a => `<option>${a}</option>`).join('');
@@ -222,7 +210,8 @@
     
     async function loadComments(params){
       try{
-        const res = await apiGet(API.dashboard, params);
+        //const res = await apiGet(API.dashboard, params);
+        const res = params;
         const data = Array.isArray(res?.data.comments) ? res.data.comments : [];
         const tbody = document.getElementById('tbl-body');
         if (!tbody) return;
@@ -284,7 +273,7 @@
       chartDonut.updateSeries([s.promoters||0, s.passives||0, s.detractors||0]);
       
       // Tabela
-      loadComments(cm)
+      loadComments(all)
 
       // atendentes
       loadAttendants(all)
