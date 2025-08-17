@@ -261,8 +261,7 @@
       const ts = all.timeseries || [];
       const cm = all.comments || [];
       
-      // KPIs
-      // ... (usa s)
+  
       
       // Gráfico por atendente
       chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x=>x.attendant) }});
@@ -275,7 +274,7 @@
       chartDonut.updateSeries([s.promoters||0, s.passives||0, s.detractors||0]);
       
       // Tabela
-      //loadComments(cm)
+      loadComments(cm)
 
       document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
     }
@@ -299,12 +298,7 @@
     // ======== INIT ========
     (async function(){
 
-      const params = collectFilters();
-      const all = (await apiGet(API.dashboard, params)).data || {};
-      const s  = all.summary || {};
-      const ba = all.byAttendant || [];
-      const ts = all.timeseries || [];
-      const cm = all.comments || [];
+      const params = collectFilters()
       
       // datas padrão (últimos 7 dias)
       const today = new Date();
@@ -316,7 +310,7 @@
       mountCharts();
     
       // 1ª atualização já com filtros aplicados
-      //await refresh();
+      await refresh();
     
       // um único listener no botão
       const applyBtn = document.getElementById('apply');
