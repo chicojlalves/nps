@@ -190,9 +190,21 @@
     }
 
     // ======== LOAD / UPDATE ========
-    async function loadAttendants(){
+    //async function loadAttendants(){
+      //  try{
+        // const { data } = await apiGet(API.dashboard);
+        // const sel = document.getElementById('attendant');
+        // sel.innerHTML = '<option value="">Todos</option>' +
+       //     (data.attendants || []).map(a => `<option>${a}</option>`).join('');
+        //}catch(err){
+         // console.error('Erro ao carregar vendedores:', err);
+        //}
+    //}
+    async function loadAttendants(att){
         try{
-          const { data } = await apiGet(API.dashboard);
+          //const { data } = await apiGet(API.dashboard);
+          data = att
+          console.log(att + " - " + data)
           const sel = document.getElementById('attendant');
           sel.innerHTML = '<option value="">Todos</option>' +
             (data.attendants || []).map(a => `<option>${a}</option>`).join('');
@@ -261,8 +273,6 @@
       const ts = all.timeseries || [];
       const cm = all.comments || [];
       
-  
-      
       // Gráfico por atendente
       chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x=>x.attendant) }});
       chartByAtt.updateSeries([{ name:'NPS', data: ba.map(x=>x.nps) }]);
@@ -275,6 +285,9 @@
       
       // Tabela
       loadComments(cm)
+
+      // atendentes
+      loadAttendants(all)
 
       document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
     }
@@ -297,8 +310,6 @@
 
     // ======== INIT ========
     (async function(){
-
-      const params = collectFilters()
       
       // datas padrão (últimos 7 dias)
       const today = new Date();
