@@ -222,20 +222,20 @@
 
     function updateAttendants(rows) {
         const storeSel = document.getElementById('stores').value;
-
-        console.log(rows);
       
         // filtra vendedores por loja, se selecionada
         const filtered = !storeSel
           ? rows
           : rows.filter(r => (r.loja || r.Loja) === storeSel);
+
+        console.log(filtred);
       
         // pega nomes únicos
         const attendants = Array.from(new Set(
           filtered.map(r => r.vendedor || r.Vendedor).filter(Boolean)
         )).sort((a,b)=>a.localeCompare(b,'pt-BR'));
 
-        console.log(attendants);
+        //console.log(attendants);
       
         // aproveita sua função atual
         loadAttendants({ attendants });
