@@ -87,7 +87,7 @@
         <div class="field"><label>De</label><input type="date" id="from"></div>
         <div class="field"><label>Até</label><input type="date" id="to"></div>
         <div class="field"><label>Atendente</label><select id="attendant"><option value="">Todos</option></select></div>
-        <div class="field"><label>Loja</label><select id="channel"><option value="">Todos</option></select></div>
+        <div class="field"><label>Loja</label><select id="store"><option value="">Todos</option></select></div>
         <button class="btn" id="apply">Aplicar</button>
       </div>
     </header>
@@ -204,6 +204,17 @@
         }
     }
 
+    async function loadStores(st){
+        try{
+          data = st;
+          const sel = document.getElementById('stores');
+          sel.innerHTML = '<option value="">Todos</option>' +
+            (data.stores || []).map(a => `<option>${a}</option>`).join('');
+        }catch(err){
+          console.error('Erro ao carregar vendedores:', err);
+        }
+    }
+
     function fmtDateISOToLocal(iso){
       const d = new Date(iso);
       if (Number.isNaN(d.getTime())) return iso;
@@ -262,6 +273,7 @@
       const all = (await apiGet(API.dashboard, params)).data || {};
       const s  = all.summary || {};
       const ba = all.byAttendant || [];
+      const st = all.stores || [];
       const ts = all.timeseries || [];
       const cm = all.comments || [];
 
@@ -288,6 +300,9 @@
 
       // atendentes
       loadAttendants(all)
+
+      // lojas
+      loadStores(all)
 
       document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
       
