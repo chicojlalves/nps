@@ -217,12 +217,14 @@
     }
 
     document.getElementById('stores').addEventListener('change', () => {
-        console.log(data);
-        updateAttendants(data.rows); // aqui usa o dataset já carregado
+        updateAttendants(data.attendants); // aqui usa o dataset já carregado
     });
 
     function updateAttendants(rows) {
         const storeSel = document.getElementById('stores').value;
+
+        consloe.log(storeSel);
+        consloe.log(rows);
       
         // filtra vendedores por loja, se selecionada
         const filtered = !storeSel
