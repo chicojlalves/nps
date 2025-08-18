@@ -348,7 +348,7 @@
       if(vnull) return '';
       const sign = v>0 ? '+' : '';
       const cls = (invert? -v : v) >= 0 ? 'ok' : 'bad';
-      return `${sign}${v}${typeof v='number'?'':''}`.replace('NaN','');
+      return `${sign}${v}${typeof v=='number'?'':''}`.replace('NaN','');
     }
 
     //  INIT 
