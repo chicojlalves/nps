@@ -313,7 +313,8 @@
       const from = document.getElementById('from').value;
       const to   = document.getElementById('to').value;
       const att  = (document.getElementById('attendant').value || '').trim();
-      return { from, to, attendant: att || undefined };
+      const st  = (document.getElementById('stores').value || '').trim();
+      return { from, to, attendant: att || undefined, stores: st || undefined };
     }
 
 
