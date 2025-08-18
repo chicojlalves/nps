@@ -211,7 +211,7 @@
           sel.innerHTML = '<option value="">Todos</option>' +
             (data.stores || []).map(a => `<option>${a}</option>`).join('');
         }catch(err){
-          console.error('Erro ao carregar vendedores:', err);
+          console.error('Erro ao carregar lojas:', err);
         }
     }
 
@@ -277,7 +277,7 @@
       const ts = all.timeseries || [];
       const cm = all.comments || [];
 
-       console.log(s);
+       console.log(st);
 
        // Atualiza os totalizadores
       document.getElementById("kpi-nps").textContent   = s.nps + "%";
