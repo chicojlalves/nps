@@ -257,7 +257,7 @@
         const tbody = document.getElementById('tbl-body');
         if (!tbody) return;
     
-        if (data.length = 0) {
+        if (data.length === 0) {
           tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#777">Sem comentários</td></tr>`;
           return;
         }
@@ -345,10 +345,10 @@
 
 
     function trendText(v, invert){
-      if(vnull) return '';
+      if(v==null) return '';
       const sign = v>0 ? '+' : '';
       const cls = (invert? -v : v) >= 0 ? 'ok' : 'bad';
-      return `${sign}${v}${typeof v=='number'?'':''}`.replace('NaN','');
+      return `${sign}${v}${typeof v==='number'?'':''}`.replace('NaN','');
     }
 
     //  INIT 
