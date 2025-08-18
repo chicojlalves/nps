@@ -225,15 +225,14 @@
       
         // filtra vendedores por loja, se selecionada
         const filtered = !storeSel? rows : rows.filter(r => (r.loja || r.Loja) === storeSel);
-
-        console.log(filtered);
       
         // pega nomes únicos
         const attendants = Array.from(new Set(
           filtered.map(r => r.vendedor || r.Vendedor).filter(Boolean)
         )).sort((a,b)=>a.localeCompare(b,'pt-BR'));
 
-        //console.log(attendants);
+        console.log("storeSel:", storeSel);
+        console.log("rows exemplo:", rows.slice(0, 5));
       
         // aproveita sua função atual
         loadAttendants({ attendants });
