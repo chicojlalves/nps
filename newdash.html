@@ -224,7 +224,7 @@
         const storeSel = document.getElementById('stores').value;
 
         console.log("storeSel:", storeSel);
-        console.log("rows exemplo:", rows.slice(0, 5));
+        console.log("rows exemplo:", rows);
       
         // filtra vendedores por loja, se selecionada
         const filtered = !storeSel? rows : rows.filter(r => (r.loja || r.Loja) === storeSel);
