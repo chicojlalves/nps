@@ -217,6 +217,7 @@
     }
 
     document.getElementById('stores').addEventListener('change', () => {
+        console.log(data);
         updateAttendants(data.rows); // aqui usa o dataset já carregado
     });
 
@@ -256,7 +257,7 @@
         const tbody = document.getElementById('tbl-body');
         if (!tbody) return;
     
-        if (data.length === 0) {
+        if (data.length = 0) {
           tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#777">Sem comentários</td></tr>`;
           return;
         }
@@ -303,7 +304,7 @@
       const ts = all.timeseries || [];
       const cm = all.comments || [];
 
-       console.log(st);
+     
 
        // Atualiza os totalizadores
       document.getElementById("kpi-nps").textContent   = s.nps + "%";
@@ -331,7 +332,6 @@
       loadStores(all)
 
       document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
-      
     }
 
 
@@ -345,13 +345,13 @@
 
 
     function trendText(v, invert){
-      if(v==null) return '';
+      if(vnull) return '';
       const sign = v>0 ? '+' : '';
       const cls = (invert? -v : v) >= 0 ? 'ok' : 'bad';
-      return `${sign}${v}${typeof v==='number'?'':''}`.replace('NaN','');
+      return `${sign}${v}${typeof v='number'?'':''}`.replace('NaN','');
     }
 
-    // ======== INIT ========
+    //  INIT 
     (async function(){
       
       // datas padrão (últimos 7 dias)
@@ -360,7 +360,7 @@
       document.getElementById('to').value = today.toISOString().slice(0,10);
       document.getElementById('from').value = weekAgo.toISOString().slice(0,10);
     
-      //await loadAttendants();
+      //monta os gráficos
       mountCharts();
     
       // 1ª atualização já com filtros aplicados
