@@ -216,7 +216,7 @@
         }
     }
 
-    document.getElementById('store').addEventListener('change', () => {
+    document.getElementById('stores').addEventListener('change', () => {
         updateAttendants(data.rows); // aqui usa o dataset já carregado
     });
 
@@ -232,6 +232,8 @@
         const attendants = Array.from(new Set(
           filtered.map(r => r.vendedor || r.Vendedor).filter(Boolean)
         )).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+
+        console.log(attendants);
       
         // aproveita sua função atual
         loadAttendants({ attendants });
