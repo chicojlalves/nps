@@ -264,6 +264,14 @@
       const ba = all.byAttendant || [];
       const ts = all.timeseries || [];
       const cm = all.comments || [];
+
+       console.log(s);
+
+       // Atualiza os totalizadores
+      document.getElementById("kpi-nps").textContent   = s.nps + "%";
+      document.getElementById("kpi-total").textContent = s.total;
+      document.getElementById("kpi-prom").textContent  = s.promoters;
+      document.getElementById("kpi-detr").textContent  = s.detractors
       
       // Gráfico por atendente
       chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x=>x.attendant) }});
@@ -282,10 +290,7 @@
       loadAttendants(all)
 
       document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
-      document.getElementById('kip-nps').textContent = new Date().toLocaleString();
-      // document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
-      // document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
-      // document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+      
     }
 
 
