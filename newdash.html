@@ -86,8 +86,8 @@
       <div class="filters">
         <div class="field"><label>De</label><input type="date" id="from"></div>
         <div class="field"><label>Até</label><input type="date" id="to"></div>
-        <div class="field"><label>Atendente</label><select id="attendant"><option value="">Todos</option></select></div>
         <div class="field"><label>Loja</label><select id="stores"><option value="">Todos</option></select></div>
+        <div class="field"><label>Atendente</label><select id="attendant"><option value="">Todos</option></select></div>
         <button class="btn" id="apply">Aplicar</button>
       </div>
     </header>
@@ -215,6 +215,29 @@
           console.error('Erro ao carregar lojas:', err);
         }
     }
+
+    document.getElementById('store').addEventListener('change', () => {
+        updateAttendants(data.rows); // aqui usa o dataset já carregado
+    });
+
+    function updateAttendants(rows) {
+        const storeSel = document.getElementById('store').value;
+      
+        // filtra vendedores por loja, se selecionada
+        const filtered = !storeSel
+          ? rows
+          : rows.filter(r => (r.loja || r.Loja) === storeSel);
+      
+        // pega nomes únicos
+        const attendants = Array.from(new Set(
+          filtered.map(r => r.vendedor || r.Vendedor).filter(Boolean)
+        )).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+      
+        // aproveita sua função atual
+        loadAttendants({ attendants });
+}
+
+
 
     function fmtDateISOToLocal(iso){
       const d = new Date(iso);
