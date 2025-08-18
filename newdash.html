@@ -142,6 +142,7 @@
       if (params?.from) qs.append('from', params.from);
       if (params?.to) qs.append('to', params.to);
       if (params?.attendant) qs.append('attendant', params.attendant.trim());
+      if (params?.stores) qs.append('stores', params.stores.trim());
       const full = qs.toString() ? `${url}?${qs}` : url;
     
       const res = await fetch(full, { method:'GET', cache:'no-store' });
