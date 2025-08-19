@@ -57,6 +57,14 @@
         const USE_BASIC_AUTH = false;          // se o webhook exigir Basic Auth
         const BASIC_AUTH_HEADER = "Basic USVEMDo3VsdHJhc2VjcmV0"; // base64(user:pass)
         const EXTRA_SECRET = "";               // opcional: querystring ?key=SEU_TOKEN
+
+        function getQueryParam(param) {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.get(param) || '';
+        }
+      
+        const companyFromURL = getQueryParam('company');
+        const storeFromURL = getQueryParam('store');
       </script>
 
       <form id="npsForm" novalidate>
@@ -155,7 +163,10 @@
         score,
         category: npsCategory(score),
         comment,
-        channel: 'QR',        client_meta: {
+        channel: 'QR',  
+        company: companyFromUrl,
+        store: storeFromUrl,
+        client_meta: {
           ua: navigator.userAgent,
           lang: navigator.language,
           platform: navigator.platform
