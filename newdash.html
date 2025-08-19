@@ -140,7 +140,6 @@
       const qs = new URLSearchParams();
       if (params?.from) qs.append('from', params.from);
       if (params?.to) qs.append('to', params.to);
-      if (params?.attendant) qs.append('attendant', params.attendant.trim());
       if (params?.stores) qs.append('stores', params.stores.trim());
       const full = qs.toString() ? `${url}?${qs}` : url;
     
@@ -309,9 +308,8 @@
     function collectFilters(){
       const from = document.getElementById('from').value;
       const to   = document.getElementById('to').value;
-      const att  = (document.getElementById('attendant').value || '').trim();
       const st  = (document.getElementById('stores').value || '').trim();
-      return { from, to, attendant: att || undefined, stores: st || undefined };
+      return { from, to, stores: st || undefined };
     }
 
 
