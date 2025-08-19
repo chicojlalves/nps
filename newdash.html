@@ -212,7 +212,8 @@
           sel.innerHTML = '<option value="">Todos</option>' +
             (data.stores || []).map(a => {
               const isSelected = a === currentValue ? ' selected' : '';
-              `<option ${isSelected}>${a}</option>`).join('');
+              `<option ${isSelected}>${a}</option>`;
+            }).join('');
         }catch(err){
           console.error('Erro ao carregar lojas:', err);
         }
