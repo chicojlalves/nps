@@ -296,8 +296,6 @@
       // atendentes
       //loadAttendants(all)
 
-      // lojas
-      loadStores(all)
 
       document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
     }
@@ -332,8 +330,9 @@
     
       // 1ª atualização já com filtros aplicados
       await refresh();
-
-      //document.getElementById('store').addEventListener('change', refresh);
+      
+      // lojas
+      loadStores(all)
     
       // um único listener no botão
       const applyBtn = document.getElementById('apply');
