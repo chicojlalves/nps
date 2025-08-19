@@ -344,6 +344,11 @@
       });
     })();
 
+    setInterval(() => {
+      console.log('Atualizando dados do dashboard automaticamente.....');
+      await refresh();
+    }, 30000);
+
   </script>
 </body>
 </html>
