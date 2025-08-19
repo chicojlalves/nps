@@ -274,8 +274,6 @@
       const ts = all.timeseries || [];
       const cm = all.comments || [];
 
-     
-
        // Atualiza os totalizadores
       document.getElementById("kpi-nps").textContent   = s.nps + "%";
       document.getElementById("kpi-total").textContent = s.total;
@@ -334,6 +332,8 @@
     
       // 1ª atualização já com filtros aplicados
       await refresh();
+
+      document.getElementById('store').addEventListener('change', refresh);
     
       // um único listener no botão
       const applyBtn = document.getElementById('apply');
