@@ -199,7 +199,7 @@
           data = att;
           const sel = document.getElementById('attendant');
           sel.innerHTML = '<option value="">Todos</option>' +
-            (data.attendants || []).map(a => `<option>${a}</option>`).join('');
+           (data.attendants || []).map(a => `<option>${a}</option>`).join('');
         }catch(err){
           console.error('Erro ao carregar vendedores:', err);
         }
@@ -215,32 +215,6 @@
           console.error('Erro ao carregar lojas:', err);
         }
     }
-
-    document.getElementById('stores').addEventListener('change', () => {
-        updateAttendants(data); // aqui usa o dataset já carregado
-    });
-
-    function updateAttendants(rows) {
-        const storeSel = document.getElementById('stores').value;
-
-        console.log("storeSel:", storeSel);
-        console.log("rows exemplo:", rows);
-      
-        // filtra vendedores por loja, se selecionada
-        const filtered = !storeSel? rows : rows.filter(r => (r.loja || r.Loja) === storeSel);
-      
-        // pega nomes únicos
-        const attendants = Array.from(new Set(
-          filtered.map(r => r.vendedor || r.Vendedor).filter(Boolean)
-        )).sort((a,b)=>a.localeCompare(b,'pt-BR'));
-
-
-      
-        // aproveita sua função atual
-        loadAttendants({ attendants });
-}
-
-
 
     function fmtDateISOToLocal(iso){
       const d = new Date(iso);
@@ -292,10 +266,8 @@
         if (tbody) tbody.innerHTML = `<tr><td colspan="4" style="padding:8px;color:#c00">Erro ao carregar</td></tr>`;
       }
     }
-
-
-
-     async function refresh(){
+    
+    async function refresh(){
       const params = collectFilters();
       const all = (await apiGet(API.dashboard, params)).data || {};
       const s  = all.summary || {};
@@ -326,7 +298,7 @@
       loadComments(all)
 
       // atendentes
-      loadAttendants(all)
+      //loadAttendants(all)
 
       // lojas
       loadStores(all)
