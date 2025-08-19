@@ -207,8 +207,12 @@
         try{
           data = st;
           const sel = document.getElementById('stores');
+          const currentValue = sel.value;
+          
           sel.innerHTML = '<option value="">Todos</option>' +
-            (data.stores || []).map(a => `<option>${a}</option>`).join('');
+            (data.stores || []).map(a => {
+              const isSelected = a === currentValue ? ´selected' : '';
+              `<option ${isSelected}>${a}</option>`).join('');
         }catch(err){
           console.error('Erro ao carregar lojas:', err);
         }
@@ -293,8 +297,8 @@
       // Tabela
       loadComments(all)
 
-      // atendentes
-      //loadAttendants(all)
+      // lojas
+      loadStores(all)
 
 
       document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
@@ -330,9 +334,6 @@
     
       // 1ª atualização já com filtros aplicados
       await refresh();
-      
-      // lojas
-      loadStores(all)
     
       // um único listener no botão
       const applyBtn = document.getElementById('apply');
