@@ -86,7 +86,7 @@
       
       const select = document.getElementById('company_id');
       select.innerHTML = '<option value="">Selecione…</option>' + 
-        (data.company || []).map(a => `<option>${a}</option>`).join('');
+        (data.company || []).map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
     } catch {
       toast('Erro ao carregar empresas');
       document.getElementById('company_id').innerHTML = '<option value="">Erro ao carregar</option>';
