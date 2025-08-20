@@ -1,2 +1,2 @@
 # nps
-NPS teste para Lojas
+NPS para Lojas de varejo
