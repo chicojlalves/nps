@@ -57,7 +57,7 @@
 
     const API = {
       company: 'https://webhook.franciscojlalves.com.br/webhook/nps/company',
-      store: 'https://webhook.franciscojlalves.com.br/webhook/nps/store-intake'
+      store: 'https://webhook.franciscojlalves.com.br/webhook/store-intake'
     };
 
     function toast(msg){
@@ -112,7 +112,7 @@
     };
 
     try {
-      const res = await fetch("https://webhook.franciscojlalves.com.br/webhook/store-intake", {
+      const res = await fetch(API.store, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
