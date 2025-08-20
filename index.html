@@ -121,7 +121,7 @@
       try{
         const { data } = await apiGet(API.sellers, { store: storeFromUrl });
 
-        conosle.log(data)
+        console.log(data)
         
         const sel = document.getElementById('attendant');
         sel.innerHTML = '<option value="">Selecione…</option>' +
