@@ -96,10 +96,10 @@
   document.getElementById('storeForm').addEventListener('submit', async function(e){
     e.preventDefault();
 
-    const empresa_id = document.getElementById('empresa_id').value.trim();
+    const company_id = document.getElementById('company_id').value.trim();
     const nome = document.getElementById('nome').value.trim();
 
-    if(!empresa_id || !nome){
+    if(!company_id || !nome){
       toast('Preencha todos os campos obrigatórios.');
       return;
     }
