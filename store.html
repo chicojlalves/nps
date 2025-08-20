@@ -83,9 +83,16 @@
       const res = await fetch(API.company);
       if (!res.ok) throw new Error();
       const { data } = await res.json();
+
+      console.log(data);
+      console.log(res.json());
+      
       const select = document.getElementById('empresa_id');
       select.innerHTML = '<option value="">Selecione…</option>' + data.map(emp => 
-        `<option value="${emp.company}">${emp.company}</option>`).join('');
+
+        console.log(emp);
+        
+        `<option value="${emp}">${emp}</option>`).join('');
     } catch {
       toast('Erro ao carregar empresas');
       document.getElementById('empresa_id').innerHTML = '<option value="">Erro ao carregar</option>';
