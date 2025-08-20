@@ -94,20 +94,6 @@
       attendants: 'https://webhook.franciscojlalves.com.br/webhook/nps/dashboard',
       sellers: 'https://webhook.franciscojlalves.com.br/webhook/nps/sellers'
     };
-
-    // busca os vendedores
-   // async function loadAttendants(){
-    //  try{
-     //   const { data } = await apiGet(API.attendants, {store: storeFromUrl});
-      //  const sel = document.getElementById('attendant');
-      //  sel.innerHTML = '<option value="">Selecione…</option>' +
-        //  (data.attendants || []).map(n => `<option>${String(n)}</option>`).join('');
-     // }catch(e){
-      //  console.error('Erro ao carregar vendedores', e);
-       // document.getElementById('attendant').innerHTML =
-        //  '<option value="" selected disabled>Erro ao carregar</option>';
-      //}
-    //}
     
     async function loadAttendants(){
       const store = storeFromUrl;
