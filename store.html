@@ -81,11 +81,11 @@
     async function carregarEmpresas(){
     try {
       const res = await fetch(API.company);
+      
+      console.log(res);
+      
       if (!res.ok) throw new Error();
       const { data } = await res.json();
-
-      console.log(data);
-      console.log(await res.json());
       
       const select = document.getElementById('empresa_id');
       select.innerHTML = '<option value="">Selecione…</option>' + 
