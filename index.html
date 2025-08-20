@@ -108,14 +108,9 @@
         //  '<option value="" selected disabled>Erro ao carregar</option>';
       //}
     //}
-
-    function getURLParam(key){
-      const url = new URL(window.location.href);
-      return url.searchParams.get(key);
-    }
     
     async function loadAttendants(){
-      const store = getURLParam('store');
+      const store = storeFromUrl;
       if (!store) {
         console.warn('Loja não informada na URL. Ex: ?store=lojaABC');
         document.getElementById('attendant').innerHTML =
@@ -124,7 +119,7 @@
       }
     
       try{
-        const { data } = await apiGet(API.sellers, { store });
+        const { data } = await apiGet(API.sellers, { store: storeFromUrl });
         const sel = document.getElementById('attendant');
         sel.innerHTML = '<option value="">Selecione…</option>' +
           (data || []).map(n => `<option>${String(n.nome)}</option>`).join('');
