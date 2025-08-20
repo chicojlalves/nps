@@ -120,12 +120,10 @@
     
       try{
         const { data } = await apiGet(API.sellers, { store });
-
-        console.log(data.nome)
         
         const sel = document.getElementById('attendant');
         sel.innerHTML = '<option value="">Selecione…</option>' +
-          (data.nome || []).map(n => `<option>${String(n.nome)}</option>`).join('');
+          (data.attendants || []).map(n => `<option>${String(n.nome)}</option>`).join('');
       }catch(e){
         console.error('Erro ao carregar vendedores', e);
         document.getElementById('attendant').innerHTML =
