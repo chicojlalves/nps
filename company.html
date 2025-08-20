@@ -61,8 +61,8 @@
         });
 
         if (!res.ok) throw new Error("Erro ao cadastrar empresa");
-        document.getElementById("msg").innerText = "Empresa cadastrada com sucesso!";
-        FORM.reset();
+          document.getElementById("msg").innerText = "Empresa cadastrada com sucesso!";
+          FORM.reset();
       } catch (err) {
         console.error(err);
         document.getElementById("msg").innerText = "Erro no cadastro. Tente novamente.";
