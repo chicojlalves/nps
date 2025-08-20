@@ -1,35 +1,64 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cadastro de Empresa</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
-    .form-card {
-      background: white; padding: 20px; max-width: 500px;
-      margin: 0 auto; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    :root {
+      --bg:#0f172a;
+      --card:#111827;
+      --muted:#94a3b8;
+      --text:#e5e7eb;
+      --accent:#22c55e;
+      --danger:#ef4444;
+      --brand:#38bdf8;
     }
-    input, button {
-      width: 100%; padding: 10px; margin-bottom: 10px;
-      border-radius: 5px; border: 1px solid #ccc;
-    }
-    button { background: #38bdf8; color: white; border: none; font-weight: bold; }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji"; background:linear-gradient(120deg,#0b1021,#0f172a 40%,#0b1021); color:var(--text)}
+    .wrap{max-width:760px; margin:4rem auto; padding:1rem}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:28px 24px; box-shadow:0 10px 30px rgba(0,0,0,0.35)}
+    h1{margin:0 0 .25rem 0; font-size:1.75rem}
+    p.sub{margin:.25rem 0 1.25rem 0; color:var(--muted)}
+    label{display:block; font-size:.95rem; margin:.5rem 0 .4rem; color:#cbd5e1}
+    input, button{width:100%; padding:.85rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:#0b1224; color:var(--text)}
+    .actions{margin-top:20px}
+    button.submit{background:linear-gradient(90deg,#22d3ee,#60a5fa); border:none; color:#0b1021; font-weight:800; letter-spacing:.2px}
+    .toast{position:fixed; right:16px; bottom:16px; background:#0b1224; border:1px solid rgba(255,255,255,.15); padding:12px 14px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.35); transform:translateY(20px); opacity:0; transition:.2s}
+    .toast.show{transform:none; opacity:1}
   </style>
 </head>
 <body>
 
-  <div class="form-card">
-    <h2>Cadastro de Empresa</h2>
+<div class="wrap">
+  <div class="card">
+    <h1>Cadastro de Empresa</h1>
+    <p class="sub">Preencha os dados para cadastrar uma nova empresa no sistema.</p>
+
     <form id="companyForm">
-      <input type="text" id="nome" placeholder="Nome da empresa" required />
-      <input type="text" id="cnpj" placeholder="CNPJ (opcional)" />
-      <input type="text" id="responsavel" placeholder="Responável" required />
-      <input type="email" id="email" placeholder="E-mail do responsável" required />
-      <input type="tel" id="telefone" placeholder="Telefone" required />
-      <button type="submit">Cadastrar Empresa</button>
+      <label for="nome">Nome da Empresa</label>
+      <input type="text" id="nome" required placeholder="Ex: Ótica Visão Total" />
+
+      <label for="cnpj">CNPJ (opcional)</label>
+      <input type="text" id="cnpj" placeholder="00.000.000/0000-00" />
+
+      <label for="responsavel">Responsável</label>
+      <input type="text" id="responsavel" required placeholder="Nome completo do responsável" />
+
+      <label for="email">E-mail de contato</label>
+      <input type="email" id="email" required placeholder="email@empresa.com.br" />
+
+      <label for="telefone">Telefone</label>
+      <input type="tel" id="telefone" required placeholder="(99) 99999-9999" />
+
+      <div class="actions">
+        <button class="submit" type="submit">Cadastrar Empresa</button>
+      </div>
     </form>
-    <div id="msg"></div>
   </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
 
