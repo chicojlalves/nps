@@ -81,9 +81,6 @@
     async function carregarEmpresas(){
     try {
       const res = await fetch(API.company);
-      
-      console.log(res);
-      
       if (!res.ok) throw new Error();
       const { data } = await res.json();
       
@@ -108,7 +105,7 @@
     }
 
     const payload = {
-      id: gerarId(),
+      id: generateID(),
       empresa_id,
       nome,
       criado_em: new Date().toISOString()
