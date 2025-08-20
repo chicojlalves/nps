@@ -92,6 +92,7 @@
   <script>
     const API = {
       attendants: 'https://webhook.franciscojlalves.com.br/webhook/nps/dashboard',
+      sellers: 'https://webhook.franciscojlalves.com.br/webhook/nps/sellers'
     };
 
     // busca os vendedores
@@ -123,7 +124,7 @@
       }
     
       try{
-        const { data } = await apiGet(API.attendantsByStore, { store });
+        const { data } = await apiGet(API.sellers, { store });
         const sel = document.getElementById('attendant');
         sel.innerHTML = '<option value="">Selecione…</option>' +
           (data || []).map(n => `<option>${String(n.nome)}</option>`).join('');
