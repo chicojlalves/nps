@@ -44,7 +44,7 @@
     FORM.addEventListener('submit', async function(e) {
       e.preventDefault();
       const payload = {
-        id: generateUUID,
+        company_id: generateUUID,
         nome: document.getElementById('nome').value.trim(),
         cnpj: document.getElementById('cnpj').value.trim(),
         email: document.getElementById('email').value.trim(),
