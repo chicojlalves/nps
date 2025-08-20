@@ -55,6 +55,11 @@
 
   <script>
 
+    const API = {
+      company: 'https://webhook.franciscojlalves.com.br/webhook/nps/company',
+      store: 'https://webhook.franciscojlalves.com.br/webhook/nps/store-intake'
+    };
+
     function toast(msg){
       const t = document.getElementById('toast');
       t.textContent = msg;
@@ -75,7 +80,7 @@
 
      async function carregarEmpresas(){
     try {
-      const res = await fetch(EMPRESAS_API);
+      const res = await fetch(API.company);
       if (!res.ok) throw new Error();
       const { data } = await res.json();
       const select = document.getElementById('empresa_id');
