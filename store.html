@@ -108,8 +108,10 @@
       id: generateID(),
       company_id,
       nome,
-      criado_em: new Date().toISOString()
+      created_at: new Date().toISOString()
     };
+
+    console.log(payload);
 
     try {
       const res = await fetch(API.store, {
