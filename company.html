@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Empresa</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    .form-card {
+      background: white; padding: 20px; max-width: 500px;
+      margin: 0 auto; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%; padding: 10px; margin-bottom: 10px;
+      border-radius: 5px; border: 1px solid #ccc;
+    }
+    button { background: #38bdf8; color: white; border: none; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div class="form-card">
+    <h2>Cadastro de Empresa</h2>
+    <form id="companyForm">
+      <input type="text" id="nome" placeholder="Nome da empresa" required />
+      <input type="text" id="cnpj" placeholder="CNPJ (opcional)" />
+      <input type="text" id="responsavel" placeholder="Responável" required />
+      <input type="email" id="email" placeholder="E-mail do responsável" required />
+      <input type="tel" id="telefone" placeholder="Telefone" required />
+      <button type="submit">Cadastrar Empresa</button>
+    </form>
+    <div id="msg"></div>
+  </div>
+
+  <script>
+    const FORM = document.getElementById('companyForm');
+    FORM.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const payload = {
+        nome: document.getElementById('nome').value.trim(),
+        cnpj: document.getElementById('cnpj').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        responsavel: document.getElementById('responsavel').value.trim(),
+        telefone: document.getElementById('telefone').value.trim(),
+        created_at: new Date().toISOString()
+      };
+
+      try {
+        const res = await fetch("https://webhook.franciscojlalves.com.br/webhook/company-intake", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error("Erro ao cadastrar empresa");
+        document.getElementById("msg").innerText = "Empresa cadastrada com sucesso!";
+        FORM.reset();
+      } catch (err) {
+        console.error(err);
+        document.getElementById("msg").innerText = "Erro no cadastro. Tente novamente.";
+      }
+    });
+  </script>
+
+</body>
+</html>
