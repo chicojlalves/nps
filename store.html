@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cadastro de Empresa</title>
+  <title>Cadastro de Loja</title>
   <style>
     :root {
       --bg:#0f172a;
@@ -21,7 +21,7 @@
     h1{margin:0 0 .25rem 0; font-size:1.75rem}
     p.sub{margin:.25rem 0 1.25rem 0; color:var(--muted)}
     label{display:block; font-size:.95rem; margin:.5rem 0 .4rem; color:#cbd5e1}
-    input, button{width:100%; padding:.85rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:#0b1224; color:var(--text)}
+    input, select, button{width:100%; padding:.85rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:#0b1224; color:var(--text)}
     .actions{margin-top:20px}
     button.submit{background:linear-gradient(90deg,#22d3ee,#60a5fa); border:none; color:#0b1021; font-weight:800; letter-spacing:.2px}
     .toast{position:fixed; right:16px; bottom:16px; background:#0b1224; border:1px solid rgba(255,255,255,.15); padding:12px 14px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.35); transform:translateY(20px); opacity:0; transition:.2s}
@@ -33,7 +33,7 @@
 <div class="wrap">
   <div class="card">
     <h1>Cadastro de Loja</h1>
-    <p class="sub">Preencha os dados para cadastrar uma nova loja e vincule a uma empresa no sistema.</p>
+    <p class="sub">Informe os dados da loja e vincule a uma empresa cadastrada.</p>
 
     <form id="storeForm">
       <label for="empresa_id">Empresa</label>
