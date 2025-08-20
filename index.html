@@ -95,19 +95,45 @@
     };
 
     // busca os vendedores
+   // async function loadAttendants(){
+    //  try{
+     //   const { data } = await apiGet(API.attendants, {store: storeFromUrl});
+      //  const sel = document.getElementById('attendant');
+      //  sel.innerHTML = '<option value="">Selecione…</option>' +
+        //  (data.attendants || []).map(n => `<option>${String(n)}</option>`).join('');
+     // }catch(e){
+      //  console.error('Erro ao carregar vendedores', e);
+       // document.getElementById('attendant').innerHTML =
+        //  '<option value="" selected disabled>Erro ao carregar</option>';
+      //}
+    //}
+
+    function getURLParam(key){
+      const url = new URL(window.location.href);
+      return url.searchParams.get(key);
+    }
+    
     async function loadAttendants(){
+      const store = getURLParam('store');
+      if (!store) {
+        console.warn('Loja não informada na URL. Ex: ?store=lojaABC');
+        document.getElementById('attendant').innerHTML =
+          '<option value="" selected disabled>Loja não informada</option>';
+        return;
+      }
+    
       try{
-        const { data } = await apiGet(API.attendants, {store: storeFromUrl});
+        const { data } = await apiGet(API.attendantsByStore, { store });
         const sel = document.getElementById('attendant');
         sel.innerHTML = '<option value="">Selecione…</option>' +
-          (data.attendants || []).map(n => `<option>${String(n)}</option>`).join('');
+          (data || []).map(n => `<option>${String(n.nome)}</option>`).join('');
       }catch(e){
         console.error('Erro ao carregar vendedores', e);
         document.getElementById('attendant').innerHTML =
           '<option value="" selected disabled>Erro ao carregar</option>';
       }
     }
-
+    
     async function apiGet(url, params){
       const qs = new URLSearchParams(params || {});
       const full = qs.toString() ? `${url}?${qs}` : url;
