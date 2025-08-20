@@ -53,6 +53,8 @@
         created_at: new Date().toISOString()
       };
 
+      console.log(payload);
+      
       try {
         const res = await fetch("https://webhook.franciscojlalves.com.br/webhook/company-intake", {
           method: "POST",
