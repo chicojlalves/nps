@@ -85,7 +85,7 @@
       const { data } = await res.json();
       const select = document.getElementById('empresa_id');
       select.innerHTML = '<option value="">Selecione…</option>' + data.map(emp => 
-        `<option value="${emp.id}">${emp.nome}</option>`).join('');
+        `<option value="${emp}">${emp}</option>`).join('');
     } catch {
       toast('Erro ao carregar empresas');
       document.getElementById('empresa_id').innerHTML = '<option value="">Erro ao carregar</option>';
