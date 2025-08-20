@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cadastro de Empresa</title>
+  <style>
+    :root {
+      --bg:#0f172a;
+      --card:#111827;
+      --muted:#94a3b8;
+      --text:#e5e7eb;
+      --accent:#22c55e;
+      --danger:#ef4444;
+      --brand:#38bdf8;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji"; background:linear-gradient(120deg,#0b1021,#0f172a 40%,#0b1021); color:var(--text)}
+    .wrap{max-width:760px; margin:4rem auto; padding:1rem}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:28px 24px; box-shadow:0 10px 30px rgba(0,0,0,0.35)}
+    h1{margin:0 0 .25rem 0; font-size:1.75rem}
+    p.sub{margin:.25rem 0 1.25rem 0; color:var(--muted)}
+    label{display:block; font-size:.95rem; margin:.5rem 0 .4rem; color:#cbd5e1}
+    input, button{width:100%; padding:.85rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:#0b1224; color:var(--text)}
+    .actions{margin-top:20px}
+    button.submit{background:linear-gradient(90deg,#22d3ee,#60a5fa); border:none; color:#0b1021; font-weight:800; letter-spacing:.2px}
+    .toast{position:fixed; right:16px; bottom:16px; background:#0b1224; border:1px solid rgba(255,255,255,.15); padding:12px 14px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.35); transform:translateY(20px); opacity:0; transition:.2s}
+    .toast.show{transform:none; opacity:1}
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+    <h1>Cadastro de Loja</h1>
+    <p class="sub">Preencha os dados para cadastrar uma nova loja e vincule a uma empresa no sistema.</p>
+
+    <form id="storeForm">
+      <label for="empresa_id">Empresa</label>
+      <select id="empresa_id" required>
+        <option value="" disabled selected>Carregando empresas…</option>
+      </select>
+                
+      <label for="nome">Nome da Loja</label>
+      <input type="text" id="nome" required placeholder="Ex: Ótica Visão Total" />
+
+      <div class="actions">
+        <button class="submit" type="submit">Cadastrar Loja</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+
+    function toast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+    
+    function generateUUID(){
+      return ([1e7]+-1e3+-4e3+-8e3+-1e11)
+        .replace(/[018]/g, c =>
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        );
+    }
+
+    function generateID(){
+      return Date.now() + '-' + Math.floor(Math.random()*1000);
+    }
+
+     async function carregarEmpresas(){
+    try {
+      const res = await fetch(EMPRESAS_API);
+      if (!res.ok) throw new Error();
+      const { data } = await res.json();
+      const select = document.getElementById('empresa_id');
+      select.innerHTML = '<option value="">Selecione…</option>' + data.map(emp => 
+        `<option value="${emp.id}">${emp.nome}</option>`).join('');
+    } catch {
+      toast('Erro ao carregar empresas');
+      document.getElementById('empresa_id').innerHTML = '<option value="">Erro ao carregar</option>';
+    }
+  }
+
+  document.getElementById('storeForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+
+    const empresa_id = document.getElementById('empresa_id').value.trim();
+    const nome = document.getElementById('nome').value.trim();
+
+    if(!empresa_id || !nome){
+      toast('Preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    const payload = {
+      id: gerarId(),
+      empresa_id,
+      nome,
+      criado_em: new Date().toISOString()
+    };
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if(!res.ok) throw new Error();
+      toast('Loja cadastrada com sucesso!');
+      document.getElementById('storeForm').reset();
+    } catch (err) {
+      console.error(err);
+      toast('Erro ao cadastrar loja.');
+    }
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', carregarEmpresas);
+  } else {
+    carregarEmpresas();
+  }
+</script>
+
+</body>
+</html>
