@@ -85,7 +85,7 @@
       const { data } = await res.json();
 
       console.log(data);
-      console.log(res.json());
+      console.log(await res.json());
       
       const select = document.getElementById('empresa_id');
       select.innerHTML = '<option value="">Selecione…</option>' + data.map(emp =>
