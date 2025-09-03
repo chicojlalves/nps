@@ -97,6 +97,7 @@
     
     async function loadAttendants(){
       const store = storeFromUrl;
+      const company = companyFromUrl;
       if (!store) {
         console.warn('Loja não informada na URL. Ex: ?store=lojaABC');
         document.getElementById('attendant').innerHTML =
@@ -105,7 +106,7 @@
       }
     
       try{
-        const { data } = await apiGet(API.sellers, { store });
+        const { data } = await apiGet(API.sellers, { store, company });
         
         const sel = document.getElementById('attendant');
         sel.innerHTML = '<option value="">Selecione…</option>' +
@@ -119,6 +120,7 @@
     
     async function apiGet(url, params){
       const qs = new URLSearchParams(params || {});
+      console.log('TESTEEEEEEE');
       const full = qs.toString() ? `${url}?${qs}` : url;
       const res = await fetch(full, { method:'GET' });
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
