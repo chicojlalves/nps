@@ -120,7 +120,6 @@
     
     async function apiGet(url, params){
       const qs = new URLSearchParams(params || {});
-      console.log('TESTEEEEEEE');
       const full = qs.toString() ? `${url}?${qs}` : url;
       const res = await fetch(full, { method:'GET' });
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
