@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Visualizador de Imagem</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: #0f172a;
+      color: #e5e7eb;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #22d3ee, #60a5fa);
+      color: #0f172a;
+      font-weight: bold;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      width: 320px;
+      margin: 40px auto;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .error {
+      color: #f87171;
+      font-weight: bold;
+      margin-top: 2rem;
+    }
+
+    #qrcode {
+        width: 300px;
+        height: 300px;
+        margin: 10px;
+    }
+
+    .toast{position:fixed; right:16px; bottom:16px; background:#0b1224; border:1px solid rgba(255,255,255,.15); padding:12px 14px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.35); transform:translateY(20px); opacity:0; transition:.2s}
+    .toast.show{transform:none; opacity:1}
+  </style>
+</head>
+<body>
+
+<div id="content" style="display:block;">
+    <button id="btn" class="btn" onclick="salvarDivComoImagem()">Donwload QRCode</button>
+    <div id="qrcode"></div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param) || '';
+    }
+
+    const companyFromUrl = getQueryParam('company');
+    const storeFromUrl = getQueryParam('store');
+
+    function toast(msg){
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    var qrcode = new QRCode("qrcode", {
+        width: 300,
+        height: 300,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+    });
+
+    function gerarQRCode(nome, company_selected) {
+
+        var elText = `https://nps.franciscojlalves.com.br/?store=${nome}&company=${company_selected}`;
+        const content = document.getElementById('content')
+        
+        console.log(elText);
+
+        if (!elText) {
+            content.style.display = 'none';
+            toast('Erro ao gerar o QRCode.');
+            return;
+        }
+        qrcode.makeCode(elText); // Gera o QR Code
+
+    }
+
+    gerarQRCode(storeFromUrl, companyFromUrl)
+
+
+    // Função para salvar a imagem da div
+    function salvarDivComoImagem() {
+        const elementoDiv = document.getElementById('qrcode'); // Obtém a div pelo ID
+
+        html2canvas(elementoDiv).then(function(canvas) {
+            // Converte o canvas para uma URL de dados (formato PNG)
+            const imgData = canvas.toDataURL("image/png");
+
+            // Cria um link temporário para download
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = 'qrcode.png'; // Define o nome do arquivo
+
+            // Adiciona o link ao documento (necessário para que funcione)
+            document.body.appendChild(link);
+
+            // Simula o clique para iniciar o download
+            link.click();
+
+            // Remove o link temporário após o download
+            document.body.removeChild(link);
+        });
+    }
+
+
+</script>
+
+</body>
+</html>
