@@ -76,10 +76,26 @@
     #tbl-body td.score.promotor { color: var(--ok); }   /* verde */
     #tbl-body td.score.neutro { color: var(--warn); }   /* amarelo */
     #tbl-body td.score.detrator { color: var(--bad); }  /* vermelho */
-
+   
+    .nav_bar{
+      background: #111827;
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
+  <nav id="nav" class="nav_bar">
+    <a href="dashboard.html" style="color: #38bdf8; text-decoration: none;">Dashboard</a>
+    <a href="company.html" style="color: #e5e7eb; text-decoration: none;">Empresa</a>
+    <a href="store.html" style="color: #e5e7eb; text-decoration: none;">Loja</a>
+    <a href="user.html" style="color: #e5e7eb; text-decoration: none;">Colaborador</a>
+  </nav>
   <div class="wrap">
     <header>
       <h1>Dashboard Pesquisa de Satisfação</h1>

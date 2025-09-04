@@ -26,11 +26,25 @@
     button.submit{background:linear-gradient(90deg,#22d3ee,#60a5fa); border:none; color:#0b1021; font-weight:800; letter-spacing:.2px}
     .toast{position:fixed; right:16px; bottom:16px; background:#0b1224; border:1px solid rgba(255,255,255,.15); padding:12px 14px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.35); transform:translateY(20px); opacity:0; transition:.2s}
     .toast.show{transform:none; opacity:1}
-
+    .nav_bar{
+      background: #111827;
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
-
+  <nav id="nav" class="nav_bar">
+    <a href="dashboard.html" style="color: #e5e7eb; text-decoration: none;">Dashboard</a>
+    <a href="company.html" style="color: #e5e7eb; text-decoration: none;">Empresa</a>
+    <a href="store.html" style="color: #38bdf8; text-decoration: none;">Loja</a>
+    <a href="user.html" style="color: #e5e7eb; text-decoration: none;">Colaborador</a>
+  </nav>
 <div class="wrap">
   <div class="card">
     <h1>Cadastro de Loja</h1>
