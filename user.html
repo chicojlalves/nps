@@ -77,7 +77,7 @@
   const API = {
     companies: 'https://webhook.franciscojlalves.com.br/webhook/nps/company',
     stores: 'https://webhook.franciscojlalves.com.br/webhook/nps/store',
-    collaborators: 'https://webhook.franciscojlalves.com.br/webhook/nps/collab-intake'
+    collaborators: 'https://webhook.franciscojlalves.com.br/webhook/collab-intake'
   };
 
   function toast(msg){
@@ -156,7 +156,7 @@
     try {
       const res = await fetch(API.collaborators, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify(payload)
       });
 
