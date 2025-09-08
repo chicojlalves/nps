@@ -36,10 +36,10 @@
 </head>
 <body>
   <nav id="nav" class="nav_bar">
-    <a href="dashboard.html" style="color: #e5e7eb; text-decoration: none;">Dashboard</a>
-    <a href="company.html" style="color: #e5e7eb; text-decoration: none;">Empresa</a>
-    <a href="store.html" style="color: #e5e7eb; text-decoration: none;">Loja</a>
-    <a href="user.html" style="color: #38bdf8; text-decoration: none;">Colaborador</a>
+    <a id="menu_dash" href="dashboard.html" style="color: #e5e7eb; text-decoration: none;">Dashboard</a>
+    <a id="menu_comp" href="company.html" style="color: #38bdf8; text-decoration: none;">Empresa</a>
+    <a id="menu_store" href="store.html" style="color: #e5e7eb; text-decoration: none;">Loja</a>
+    <a id="menu_user" href="user.html" style="color: #e5e7eb; text-decoration: none;">Colaborador</a>
   </nav>
 <div class="wrap">
   <div class="card">
@@ -106,19 +106,48 @@
     return Date.now() + '-' + Math.floor(Math.random()*1000);
   }
 
-  async function carregarEmpresas(){
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param) || '';
+  }
+
+  const companyFromUrl = getQueryParam('company');
+
+  const dash = document.getElementById('menu_dash')
+  dash.href = `dashboard.html?company=${companyFromUrl}`;
+  const comp = document.getElementById('menu_comp')
+  comp.href = `company.html?company=${companyFromUrl}`;
+  const store = document.getElementById('menu_store')
+  store.href = `store.html?company=${companyFromUrl}`;
+  const user = document.getElementById('menu_user')
+  user.href = `user.html?company=${companyFromUrl}`;
+
+  async function loadCompanys(){
     try {
       const res = await fetch(API.companies);
       const { data } = await res.json();
-      const select = document.getElementById('company_id');
-      select.innerHTML = '<option value="">Selecione…</option>' +
-        (data.company || []).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+
+      let company = [];
+
+      if(companyFromUrl != "0") { 
+        company = (data.company || []).filter(s => s.id === companyFromUrl);
+        const select = document.getElementById('company_id');
+        select.innerHTML = //'<option value="">Selecione…</option>' +
+          (company || []).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+        select.disabled = true;
+        loadStoresForCompany(companyFromUrl)
+      }else{
+        company = data.company;
+        const select = document.getElementById('company_id');
+        select.innerHTML = '<option value="">Selecione…</option>' +
+          (company || []).map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+      }
     } catch {
       toast('Erro ao carregar empresas');
     }
   }
 
-  async function carregarLojasPorEmpresa(company_id){
+  async function loadStoresForCompany(company_id){
     try {
       const res = await fetch(API.stores);
       const { data } = await res.json();
@@ -133,7 +162,7 @@
 
   document.getElementById('company_id').addEventListener('change', function(){
     const company_id = this.value;
-    carregarLojasPorEmpresa(company_id);
+    loadStoresForCompany(company_id);
   });
 
   document.getElementById('collabForm').addEventListener('submit', async function(e){
@@ -149,6 +178,11 @@
     
     if(!company_id || !store_id || !role || !nome || ((role === 'admin' || role === 'manager') && (!email || !senha  || !confirme_senha))) {
       toast('Preencha todos os campos obrigatórios.');
+      return;
+    }
+    
+    if(nome.length < 2) {
+      toast('O nome precisar ter pelo menos duas letras');
       return;
     }
     
@@ -185,9 +219,9 @@
   });
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', carregarEmpresas);
+    document.addEventListener('DOMContentLoaded', loadCompanys);
   } else {
-    carregarEmpresas();
+    loadCompanys();
   }
 
   document.getElementById('role').addEventListener('change', function() {

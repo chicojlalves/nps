@@ -91,10 +91,10 @@
 </head>
 <body>
   <nav id="nav" class="nav_bar">
-    <a href="dashboard.html" style="color: #38bdf8; text-decoration: none;">Dashboard</a>
-    <a href="company.html" style="color: #e5e7eb; text-decoration: none;">Empresa</a>
-    <a href="store.html" style="color: #e5e7eb; text-decoration: none;">Loja</a>
-    <a href="user.html" style="color: #e5e7eb; text-decoration: none;">Colaborador</a>
+    <a id="menu_dash" href="dashboard.html" style="color: #e5e7eb; text-decoration: none;">Dashboard</a>
+    <a id="menu_comp" href="company.html" style="color: #38bdf8; text-decoration: none;">Empresa</a>
+    <a id="menu_store" href="store.html" style="color: #e5e7eb; text-decoration: none;">Loja</a>
+    <a id="menu_user" href="user.html" style="color: #e5e7eb; text-decoration: none;">Colaborador</a>
   </nav>
   <div class="wrap">
     <header>
@@ -102,7 +102,7 @@
       <div class="filters">
         <div class="field"><label>De</label><input type="date" id="from"></div>
         <div class="field"><label>Até</label><input type="date" id="to"></div>
-        <div class="field"><label>Loja</label><select id="stores"><option value="">Todos</option></select></div>
+        <div class="field"><label>Loja</label><select id="stores"><option value="">Selecione..</option></select></div>
         <button class="btn" id="apply">Aplicar</button>
       </div>
     </header>
@@ -145,18 +145,44 @@
     <div class="footer">Atualizado: <span id="lastUpdate">–</span></div>
   </div>
 
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
   <script>
     // ======== CONFIG ========
-    // Substitua estes endpoints pelos do seu n8n quando prontos
     const API = {
       dashboard: 'https://webhook.franciscojlalves.com.br/webhook/nps/dashboard',
+      store: 'https://webhook.franciscojlalves.com.br/webhook/nps/store',
     }
+
+    function toast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param) || '';
+    }
+
+    const companyFromUrl = getQueryParam('company');
+
+    const dash = document.getElementById('menu_dash')
+    dash.href = `dashboard.html?company=${companyFromUrl}`;
+    const comp = document.getElementById('menu_comp')
+    comp.href = `company.html?company=${companyFromUrl}`;
+    const store = document.getElementById('menu_store')
+    store.href = `store.html?company=${companyFromUrl}`;
+    const user = document.getElementById('menu_user')
+    user.href = `user.html?company=${companyFromUrl}`;
 
     async function apiGet(url, params){
       const qs = new URLSearchParams();
       if (params?.from) qs.append('from', params.from);
       if (params?.to) qs.append('to', params.to);
       if (params?.stores) qs.append('stores', params.stores.trim());
+      if (params?.company) qs.append('company', params.company.trim());
       const full = qs.toString() ? `${url}?${qs}` : url;
     
       const res = await fetch(full, { method:'GET', cache:'no-store' });
@@ -219,20 +245,30 @@
         }
     }
 
-    async function loadStores(st){
-        try{
-          data = st;
-          const sel = document.getElementById('stores');
-          const currentValue = sel.value;
-          
-          sel.innerHTML = '<option value="">Todos</option>' +
-            (data.stores || []).map(a => {
-              const isSelected = a === currentValue ? ' selected' : '';
-              return `<option ${isSelected}>${a}</option>`;
-            }).join('');
-        }catch(err){
-          console.error('Erro ao carregar lojas:', err);
+    async function loadStoresForCompany(company_id){
+      try {
+        const res = await fetch(API.store);
+        const { data } = await res.json();
+        let lojas = [];
+
+        if(company_id !== "0") { 
+          lojas = (data.store || []).filter(s => s.company_id === company_id);
+        }else{
+           lojas = data.store;
         }
+        
+        const select = document.getElementById('stores');
+        const currentValue = select.value;
+        
+        select.innerHTML = '<option value="">Todas</option>' +
+        lojas.map(s => {
+            const isSelected = s.id === currentValue ? ' selected' : '';
+            console.log(s.id, currentValue);
+            return `<option ${isSelected} value="${s.id}">${s.nome}</option>`;
+          }).join('');
+      } catch {
+        toast('Erro ao carregar lojas');
+      }
     }
 
     function fmtDateISOToLocal(iso){
@@ -287,46 +323,51 @@
     }
     
     async function refresh(){
+
+      const companyFromUrl = getQueryParam('company');
       const params = collectFilters();
-      const all = (await apiGet(API.dashboard, params)).data || {};
-      const s  = all.summary || {};
-      const ba = all.byAttendant || [];
-      const st = all.stores || [];
-      const ts = all.timeseries || [];
-      const cm = all.comments || [];
 
-       // Atualiza os totalizadores
-      document.getElementById("kpi-nps").textContent   = s.nps + "%";
-      document.getElementById("kpi-total").textContent = s.total;
-      document.getElementById("kpi-prom").textContent  = s.promoters;
-      document.getElementById("kpi-detr").textContent  = s.detractors
-      
-      // Gráfico por atendente
-      chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x=>x.attendant) }});
-      chartByAtt.updateSeries([{ name:'NPS', data: ba.map(x=>x.nps) }]);
-      
-      // Timeseries
-      chartTimes.updateSeries([{ name:'NPS', data: ts.map(x=>({ x:new Date(x.date).getTime(), y:x.nps })) }]);
-      
-      // Donut
-      chartDonut.updateSeries([s.promoters||0, s.passives||0, s.detractors||0]);
-      
-      // Tabela
-      loadComments(all)
+      if(companyFromUrl){
 
-      // lojas
-      loadStores(all)
+        const all = (await apiGet(API.dashboard, params)).data || {};
+        const s  = all.summary || {};
+        const ba = all.byAttendant || [];
+        const st = all.stores || {};
+        const ts = all.timeseries || [];
+        const cm = all.comments || [];
 
+        // Atualiza os totalizadores
+        document.getElementById("kpi-nps").textContent   = s.nps + "%";
+        document.getElementById("kpi-total").textContent = s.total;
+        document.getElementById("kpi-prom").textContent  = s.promoters;
+        document.getElementById("kpi-detr").textContent  = s.detractors
+        
+        // Gráfico por atendente
+        chartByAtt.updateOptions({ xaxis:{ categories: ba.map(x=>x.attendant) }});
+        chartByAtt.updateSeries([{ name:'NPS', data: ba.map(x=>x.nps) }]);
+        
+        // Timeseries
+        chartTimes.updateSeries([{ name:'NPS', data: ts.map(x=>({ x:new Date(x.date).getTime(), y:x.nps })) }]);
+        
+        // Donut
+        chartDonut.updateSeries([s.promoters||0, s.passives||0, s.detractors||0]);
+        
+        // Tabela
+        loadComments(all)
 
+        // lojas
+        loadStoresForCompany(companyFromUrl)
+
+      }
       document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
     }
-
 
     function collectFilters(){
       const from = document.getElementById('from').value;
       const to   = document.getElementById('to').value;
       const st  = (document.getElementById('stores').value || '').trim();
-      return { from, to, stores: st || undefined };
+      const cp = (getQueryParam('company') || '');
+      return { from, to, stores: st, company: cp || undefined };
     }
 
 
@@ -345,12 +386,14 @@
       const weekAgo = new Date(Date.now() - 6*24*60*60*1000);
       document.getElementById('to').value = today.toISOString().slice(0,10);
       document.getElementById('from').value = weekAgo.toISOString().slice(0,10);
-    
+  
       //monta os gráficos
       mountCharts();
     
       // 1ª atualização já com filtros aplicados
       await refresh();
+
+      const companyFromUrl = getQueryParam('company');
     
       // um único listener no botão
       const applyBtn = document.getElementById('apply');
@@ -364,7 +407,7 @@
     setInterval(() => {
       console.log('Atualizando dados do dashboard automaticamente.....');
       refresh();
-    }, 300000);
+    }, 3600000);
 
   </script>
 </body>
