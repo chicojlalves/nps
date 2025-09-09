@@ -95,15 +95,20 @@
       return Date.now() + '-' + Math.floor(Math.random()*1000);
     }
 
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param) || '';
+    }
+
     const companyFromUrl = getQueryParam('company');
 
-    const dash = document.getElementById('menu_dash')
+    const dash = document.getElementById('menu_dash');
     dash.href = `dashboard.html?company=${companyFromUrl}`;
-    const comp = document.getElementById('menu_comp')
+    const comp = document.getElementById('menu_comp');
     comp.href = `company.html?company=${companyFromUrl}`;
-    const store = document.getElementById('menu_store')
+    const store = document.getElementById('menu_store');
     store.href = `store.html?company=${companyFromUrl}`;
-    const user = document.getElementById('menu_user')
+    const user = document.getElementById('menu_user');
     user.href = `user.html?company=${companyFromUrl}`;
 
     const FORM = document.getElementById('companyForm');
