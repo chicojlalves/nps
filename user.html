@@ -61,9 +61,14 @@
       <label for="role">Função</label>
       <select id="role" required>
         <option value="">Selecione…</option>
-        <option value="admin">Supervisor</option>
-        <option value="manager">Gerente</option>
-        <option value="seller">Equipe</option>
+        <option value="Supervisor(a)">Supervisor(a)</option>
+        <option value="Gerente">Gerente</option>
+        <option value="Vendedor(a)">Vendedor(a)</option>
+        <option value="Auxiliar">Auxiliar</option>
+        <option value="Caixa">Caixa</option>
+        <option value="Recepcionista">Recepcionista</option>
+        <option value="Locutor(a)">Locutor(a)</option>
+        <option value="Captador(a)">Captador(a)</option>
       </select>
 
       <label for="nome">Nome</label>
@@ -87,13 +92,33 @@
   </div>
 </div>
 
+<div class="wrap">
+  <div class="card">
+    <h2>Colaboradores Cadastradas</h2>
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th style="text-align:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.15)">Nome</th>
+          <th style="text-align:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.15)">Função</th>
+          <th style="text-align:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.15)">Loja</th>
+        </tr>
+      </thead>
+      <tbody id="userList">
+        <tr><td colspan="3" style="text-align:center; padding:8px; color:var(--muted)">Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
   const API = {
     companies: 'https://webhook.franciscojlalves.com.br/webhook/nps/company',
     stores: 'https://webhook.franciscojlalves.com.br/webhook/nps/store',
-    collaborators: 'https://webhook.franciscojlalves.com.br/webhook/collab-intake'
+    collaborators: 'https://webhook.franciscojlalves.com.br/webhook/collab-intake',
+    users: 'https://webhook.franciscojlalves.com.br/webhook/nps/colaborator',
+    //sellers: 'https://webhook.franciscojlalves.com.br/webhook/nps/sellers'
   };
 
   function toast(msg){
@@ -152,18 +177,22 @@
     }
   }
 
+  let lojas = [];
+
   async function loadStoresForCompany(company_id){
     try {
       const res = await fetch(API.stores);
       const { data } = await res.json();
-      const lojas = (data.store || []).filter(s => s.company_id === company_id);
+      lojas = (data.store || []).filter(s => s.company_id === company_id);
       const select = document.getElementById('store_id');
       select.innerHTML = '<option value="">Selecione…</option>' +
         lojas.map(s => `<option value="${s.id}">${s.nome}</option>`).join('');
     } catch {
-      toast('Erro ao carregar lojas');
+      toast('Erro ao carregar colaboradores');
     }
   }
+
+  loadUserForCompany(companyFromUrl);
 
   document.getElementById('company_id').addEventListener('change', function(){
     const company_id = this.value;
@@ -217,6 +246,7 @@
       if(!res.ok) throw new Error();
       toast('Colaborador cadastrado com sucesso!');
       document.getElementById('collabForm').reset();
+      loadUserForCompany(company_id);
     } catch (err) {
       console.log(err);
       toast('Erro ao cadastrar colaborador.');
@@ -236,7 +266,7 @@
     const confirme_senha = document.getElementById('confirme_senha');
     const role = this.value;
 
-    if(role === 'admin' || role === 'manager'){
+    if(role === 'Supervisor(a)' || role === 'Gerente'){
       credenciais.style.display = 'block';
       email.setAttribute('required', '');
       senha.setAttribute('required', '');
@@ -252,6 +282,50 @@
       document.getElementById('confirme_senha').value = '';
     }
   });
+
+  async function loadUserForCompany(company_id){
+    try {
+      
+      const resColabs = await fetch(API.users);
+      var { data } = await resColabs.json();
+      const colabs = (data.users || []).filter(s => s.company_id === company_id);
+      
+      const res = await fetch(API.stores);
+      var { data } = await res.json();
+      const lojas = (data.store || [])
+
+      let colaborador = [];
+
+      for (let i = 0; i < colabs.length; i++){
+        colaborador = colabs[i];  
+        for (let j = 0; j < lojas.length; j++){
+          if(colabs[i].store_id === lojas[j].id){
+            colabs[i]["loja"] = lojas[j].nome;
+          }
+        }
+      }
+
+      colabs.sort(function(a,b) {
+        return a.loja < b.loja ? -1 : a.loja > b.loja ? 1 : 0;
+      });
+
+      const tbody = document.getElementById('userList');
+      if (!colabs || !colabs.length) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:8px; color:var(--muted)">Nenhum colaborador cadastrado(a).</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = colabs.map(s => `
+        <tr>
+          <td style="text-align:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.05)">${s.nome}</td>
+          <td style="text-align:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.05)">${s.funcao}</td>
+          <td style="text-align:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.05)">${s.loja}</td>
+        </tr>
+      `).join('');
+    } catch (e) {
+      document.getElementById('userList').innerHTML = '<tr><td colspan="3" style="text-align:center; padding:8px; color:var(--danger)">Erro ao carregar lojas</td></tr>';
+    }
+  }
 
 </script>
 
