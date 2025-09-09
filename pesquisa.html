@@ -46,7 +46,7 @@
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap">
         <div>
-          <h1>Pesquisa de Satisfação da Loja</h1>
+          <h1>Pesquisa de Satisfação da Loja - <span id="loja"></span></h1>
           <p class="sub">De 0 a 10, qual a probabilidade de você nos recomendar?</p>
         </div>
       </div>
@@ -65,6 +65,9 @@
       
         const companyFromUrl = getQueryParam('company');
         const storeFromUrl = getQueryParam('store');
+      
+
+
       </script>
 
       <form id="npsForm" novalidate>
@@ -92,9 +95,23 @@
   <script>
     const API = {
       attendants: 'https://webhook.franciscojlalves.com.br/webhook/nps/dashboard',
-      sellers: 'https://webhook.franciscojlalves.com.br/webhook/nps/sellers'
+      sellers: 'https://webhook.franciscojlalves.com.br/webhook/nps/sellers',
+      stores: 'https://webhook.franciscojlalves.com.br/webhook/nps/store'
     };
-    
+
+    async function loadStore(storeFromUrl) {
+  
+      const { data } = await apiGet(API.stores);
+      const loja = (data.store || []).filter(s => s.id === storeFromUrl);
+  
+      const span_loja = document.getElementById('loja')
+
+      span_loja.textContent = loja[0].nome
+    }
+
+    //console.log(lojas);
+    loadStore(storeFromUrl)
+
     async function loadAttendants(){
       const store = storeFromUrl;
       const company = companyFromUrl;
