@@ -197,6 +197,7 @@
   document.getElementById('company_id').addEventListener('change', function(){
     const company_id = this.value;
     loadStoresForCompany(company_id);
+    loadUserForCompany(company_id);
   });
 
   document.getElementById('collabForm').addEventListener('submit', async function(e){
