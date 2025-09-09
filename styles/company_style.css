@@ -1,0 +1,63 @@
+.wrap {
+    max-width: 760px;
+    margin: 4rem auto;
+    padding: 1rem
+}
+
+.card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 28px 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35)
+}
+
+h1 {
+    margin: 0 0 .25rem 0;
+    font-size: 1.75rem
+}
+
+p.sub {
+    margin: .25rem 0 1.25rem 0;
+    color: var(--muted)
+}
+
+label {
+    display: block;
+    font-size: .95rem;
+    margin: .5rem 0 .4rem;
+    color: #cbd5e1
+}
+
+input,
+button {
+    width: 100%;
+    padding: .85rem 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #0b1224;
+    color: var(--text)
+}
+
+.actions {
+    margin-top: 20px
+}
+
+button.submit {
+    background: linear-gradient(90deg, #22d3ee, #60a5fa);
+    border: none;
+    color: #0b1021;
+    font-weight: 800;
+    letter-spacing: .2px
+}
+
+.nav_bar {
+    background: #111827;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-weight: 600;
+}

@@ -4,29 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login</title>
-  <style>
-    :root {
-      --bg:#0f172a;
-      --card:#111827;
-      --muted:#94a3b8;
-      --text:#e5e7eb;
-      --accent:#22c55e;
-      --danger:#ef4444;
-      --brand:#38bdf8;
-    }
-    *{box-sizing:border-box}
-    body{margin:0; padding: 0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:linear-gradient(120deg,#0b1021,#0f172a 1000%,#0b1021); color:var(--text)}
-    .wrap{max-width:420px;  margin:4rem auto; padding:1rem}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:28px 24px; box-shadow:0 10px 30px rgba(0,0,0,0.35)}
-    h1{margin:0 0 .25rem 0; font-size:1.75rem; text-align: center;}
-    p.sub{margin:.25rem 0 1.25rem 0; color:var(--muted); text-align: center;}
-    label{display:block; font-size:.95rem; margin:.5rem 0 .4rem; color:#cbd5e1}
-    input, button{width:100%; padding:.85rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:#0b1224; color:var(--text)}
-    .actions{margin-top:20px}
-    button.submit{background:linear-gradient(90deg,#22d3ee,#60a5fa); border:none; color:#0b1021; font-weight:800; letter-spacing:.2px}
-    .toast{position:fixed; right:16px; bottom:16px; background:#0b1224; border:1px solid rgba(255,255,255,.15); padding:12px 14px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.35); transform:translateY(20px); opacity:0; transition:.2s}
-    .toast.show{transform:none; opacity:1}
-  </style>
+  <link rel="stylesheet" href="styles/global_style.css">
+  <link rel="stylesheet" href="styles/index_style.css">
+  <script src="scripts/index_script.js" defer></script>
+  <script src="scripts/util_script.js"></script>
+
 </head>
 <body>
 
@@ -52,53 +34,7 @@
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
-  const API = {
-    // login: 'https://n8n.franciscojlalves.com.br/webhook-test/login' // Ajuste para seu endpoint real
-    login: 'https://webhook.franciscojlalves.com.br/webhook/login' // Ajuste para seu endpoint real
-  };
 
-  function toast(msg){
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3500);
-  }
-
-  document.getElementById('loginForm').addEventListener('submit', async function(e){
-    e.preventDefault();
-
-    const email = document.getElementById('email').value.trim();
-    const senha = document.getElementById('senha').value.trim();
-
-    if (!email || !senha) {
-      toast('Preencha todos os campos.');
-      return;
-    }
-
-    try {
-      const res = await fetch(API.login, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, senha })
-      });
-
-      const json = await res.json();
-
-      console.log(res, json);
-
-      if (res.ok && json.token) {
-        // Sucesso no login — você pode salvar o token, redirecionar, etc.
-        localStorage.setItem("authToken", json.token);
-        toast('Login realizado com sucesso!');
-        window.location.href = `dashboard.html?company=${json.token}`; // ou qualquer outra página
-      } else {
-        toast(json.message || 'Usuário ou senha inválidos.');
-      }
-    } catch (err) {
-      console.error(err);
-      toast('Erro ao tentar fazer login.');
-    }
-  });
 </script>
 
 </body>

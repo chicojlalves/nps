@@ -6,10 +6,6 @@ const API = {
   users: "https://webhook.franciscojlalves.com.br/webhook/nps/colaborator",
 }
 
-function getQueryParam(param) {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(param) || "";
-}
 const companyFromUrl = getQueryParam("company");
 
 const dash = document.getElementById("menu_dash");
@@ -24,23 +20,6 @@ user.href = `user.html?company=${companyFromUrl}`;
 if (companyFromUrl != "0") {
   comp.style.display = "none";
 }
-
-function toast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 3500);
-}
-
-function generateID() {
-  return Date.now() + "-" + Math.floor(Math.random() * 1000);
-}
-
-function getQueryParam(param) {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(param) || "";
-}
-
 
 async function loadCompanys() {
   try {

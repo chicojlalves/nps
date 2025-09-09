@@ -1,0 +1,143 @@
+.wrap {
+    max-width: 760px;
+    margin: 4rem auto;
+    padding: 1rem
+}
+
+.card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 28px 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35)
+}
+
+h1 {
+    margin: 0 0 .25rem 0;
+    font-size: 1.75rem
+}
+
+p.sub {
+    margin: .25rem 0 1.25rem 0;
+    color: var(--muted)
+}
+
+label {
+    display: block;
+    font-size: .95rem;
+    margin: .5rem 0 .4rem;
+    color: #cbd5e1
+}
+
+select,
+textarea,
+input[type="text"],
+button {
+    width: 100%;
+    padding: .85rem 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #0b1224;
+    color: var(--text)
+}
+
+textarea {
+    min-height: 110px;
+    resize: vertical
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px
+}
+
+.help {
+    font-size: .8rem;
+    color: var(--muted)
+}
+
+.scale {
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    gap: 6px;
+    margin: .35rem 0 1rem
+}
+
+.btn-score {
+    appearance: none;
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: #0b1224;
+    color: #cbd5e1;
+    padding: .7rem 0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: .15s;
+    font-weight: 600
+}
+
+.btn-score:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, .25)
+}
+
+.btn-score[data-active="true"] {
+    background: #0f1b39;
+    border-color: #60a5fa
+}
+
+.btn-score[data-val="0"],
+[data-val="1"],
+[data-val="2"] {
+    --col: var(--danger)
+}
+
+.btn-score[data-val="9"],
+[data-val="10"] {
+    --col: var(--accent)
+}
+
+.legend {
+    display: flex;
+    justify-content: space-between;
+    font-size: .85rem;
+    color: var(--muted);
+    margin-top: .25rem
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 18px
+}
+
+button.submit {
+    background: linear-gradient(90deg, #22d3ee, #60a5fa);
+    border: none;
+    color: #0b1021;
+    font-weight: 800;
+    letter-spacing: .2px
+}
+
+button.submit:disabled {
+    opacity: .5
+}
+
+.notice {
+    margin-top: 8px;
+    font-size: .8rem;
+    color: var(--muted)
+}
+
+.tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 999px;
+    padding: .25rem .6rem;
+    font-size: .78rem;
+    color: #cbd5e1
+}

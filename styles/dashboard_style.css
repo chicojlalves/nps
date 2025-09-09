@@ -1,0 +1,182 @@
+.wrap {
+    max-width: 1180px;
+    margin: 24px auto;
+    padding: 0 16px
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.6rem
+}
+
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: end
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px
+}
+
+.field label {
+    font-size: .85rem;
+    color: var(--muted)
+}
+
+.field input,
+.field select,
+.btn {
+    background: #0b1224;
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 10px;
+    padding: .6rem .75rem
+}
+
+.btn {
+    cursor: pointer;
+    font-weight: 700
+}
+
+.grid {
+    display: grid;
+    gap: 14px
+}
+
+@media (min-width: 920px) {
+    .grid.cols-4 {
+        grid-template-columns: repeat(4, 1fr)
+    }
+}
+
+@media (min-width: 920px) {
+    .grid.cols-2 {
+        grid-template-columns: repeat(2, 1fr)
+    }
+}
+
+.card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .02));
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .35)
+}
+
+.kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 2px
+}
+
+.kpi .label {
+    font-size: .8rem;
+    color: var(--muted)
+}
+
+.kpi .value {
+    font-size: 1.8rem;
+    font-weight: 800
+}
+
+.kpi .trend {
+    font-size: .8rem
+}
+
+.kpi .trend.ok {
+    color: var(--ok)
+}
+
+.kpi .trend.bad {
+    color: var(--bad)
+}
+
+.chart {
+    height: 320px
+}
+
+.footer {
+    opacity: .6;
+    font-size: .8rem;
+    margin: 18px 0;
+    text-align: center
+}
+
+/* Caixa da tabela com barra de rolagem */
+.table-wrapper {
+    max-height: 400px;
+    /* ajusta a altura máxima */
+    overflow-y: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, .08);
+}
+
+/* Cabeçalho fixo */
+.table-wrapper table thead th {
+    position: sticky;
+    top: 0;
+    background: linear-gradient(180deg, rgba(15, 23, 42, .95), rgba(15, 23, 42, .85));
+    backdrop-filter: saturate(120%) blur(4px);
+}
+
+/* Linhas zebradas */
+.table-wrapper tbody tr:nth-child(odd) {
+    background: rgba(255, 255, 255, .02);
+}
+
+/* Bordas sutis */
+.table-wrapper table td,
+.table-wrapper table th {
+    border-bottom: 1px solid rgba(255, 255, 255, .05);
+}
+
+/* Espaçamento */
+.table-wrapper table td,
+.table-wrapper table th {
+    padding: 8px;
+}
+
+/* cores de acordo com a nota NPS */
+#tbl-body td.score {
+    font-weight: 700;
+    text-align: center;
+}
+
+#tbl-body td.score.promotor {
+    color: var(--ok);
+}
+
+/* verde */
+#tbl-body td.score.neutro {
+    color: var(--warn);
+}
+
+/* amarelo */
+#tbl-body td.score.detrator {
+    color: var(--bad);
+}
+
+/* vermelho */
+
+.nav_bar {
+    background: #111827;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-weight: 600;
+}

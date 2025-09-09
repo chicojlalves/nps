@@ -1,43 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cadastro de Empresa</title>
-  <style>
-    :root {
-      --bg:#0f172a;
-      --card:#111827;
-      --muted:#94a3b8;
-      --text:#e5e7eb;
-      --accent:#22c55e;
-      --danger:#ef4444;
-      --brand:#38bdf8;
-    }
-    *{box-sizing:border-box}
-    body{margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji"; background:linear-gradient(120deg,#0b1021,#0f172a 40%,#0b1021); color:var(--text)}
-    .wrap{max-width:760px; margin:4rem auto; padding:1rem}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:28px 24px; box-shadow:0 10px 30px rgba(0,0,0,0.35)}
-    h1{margin:0 0 .25rem 0; font-size:1.75rem}
-    p.sub{margin:.25rem 0 1.25rem 0; color:var(--muted)}
-    label{display:block; font-size:.95rem; margin:.5rem 0 .4rem; color:#cbd5e1}
-    input, button{width:100%; padding:.85rem 1rem; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:#0b1224; color:var(--text)}
-    .actions{margin-top:20px}
-    button.submit{background:linear-gradient(90deg,#22d3ee,#60a5fa); border:none; color:#0b1021; font-weight:800; letter-spacing:.2px}
-    .toast{position:fixed; right:16px; bottom:16px; background:#0b1224; border:1px solid rgba(255,255,255,.15); padding:12px 14px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.35); transform:translateY(20px); opacity:0; transition:.2s}
-    .toast.show{transform:none; opacity:1}
-    .nav_bar{
-      background: #111827;
-      padding: 1rem;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 16px;
-      font-weight: 600;
-    }
-  </style>
+  <link rel="stylesheet" href="styles/global_style.css">
+  <link rel="stylesheet" href="styles/company_style.css">
+  <script src="scripts/company_script.js" defer></script>
+  <script src="scripts/util_script.js"></script>
+
 </head>
+
 <body>
   <nav id="nav" class="nav_bar">
     <a id="menu_dash" href="dashboard.html?company=0" style="color: #e5e7eb; text-decoration: none;">Dashboard</a>
@@ -46,111 +20,36 @@
     <a id="menu_user" href="user.html?company=0" style="color: #e5e7eb; text-decoration: none;">Colaborador</a>
     <a id="menu_logoff" href="/" style="color: #e5e7eb; text-decoration: none;">Sair</a>
   </nav>
-<div class="wrap">
-  <div class="card">
-    <h1>Cadastro de Empresa</h1>
-    <p class="sub">Preencha os dados para cadastrar uma nova empresa no sistema.</p>
+  <div class="wrap">
+    <div class="card">
+      <h1>Cadastro de Empresa</h1>
+      <p class="sub">Preencha os dados para cadastrar uma nova empresa no sistema.</p>
 
-    <form id="companyForm">
-      <label for="nome">Nome da Empresa</label>
-      <input type="text" id="nome" required placeholder="Ex: Ótica Visão Total" />
+      <form id="companyForm">
+        <label for="nome">Nome da Empresa</label>
+        <input type="text" id="nome" required placeholder="Ex: Ótica Visão Total" />
 
-      <label for="cnpj">CNPJ (opcional)</label>
-      <input type="text" id="cnpj" placeholder="00.000.000/0000-00" />
+        <label for="cnpj">CNPJ (opcional)</label>
+        <input type="text" id="cnpj" placeholder="00.000.000/0000-00" />
 
-      <label for="responsavel">Responsável</label>
-      <input type="text" id="responsavel" required placeholder="Nome completo do responsável" />
+        <label for="responsavel">Responsável</label>
+        <input type="text" id="responsavel" required placeholder="Nome completo do responsável" />
 
-      <label for="email">E-mail de contato</label>
-      <input type="email" id="email" required placeholder="email@empresa.com.br" />
+        <label for="email">E-mail de contato</label>
+        <input type="email" id="email" required placeholder="email@empresa.com.br" />
 
-      <label for="telefone">Telefone</label>
-      <input type="tel" id="telefone" required placeholder="(99) 99999-9999" />
+        <label for="telefone">Telefone</label>
+        <input type="tel" id="telefone" required placeholder="(99) 99999-9999" />
 
-      <div class="actions">
-        <button class="submit" type="submit">Cadastrar Empresa</button>
-      </div>
-    </form>
+        <div class="actions">
+          <button class="submit" type="submit">Cadastrar Empresa</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <script>
-
-    function toast(msg){
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3500);
-    }
-    
-    function generateUUID(){
-      return ([1e7]+-1e3+-4e3+-8e3+-1e11)
-        .replace(/[018]/g, c =>
-          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-        );
-    }
-
-    function generateID(){
-      return Date.now() + '-' + Math.floor(Math.random()*1000);
-    }
-
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param) || '';
-    }
-
-    const companyFromUrl = getQueryParam('company');
-
-    const dash = document.getElementById('menu_dash');
-    dash.href = `dashboard.html?company=${companyFromUrl}`;
-    const comp = document.getElementById('menu_comp');
-    comp.href = `company.html?company=${companyFromUrl}`;
-    const store = document.getElementById('menu_store');
-    store.href = `store.html?company=${companyFromUrl}`;
-    const user = document.getElementById('menu_user');
-    user.href = `user.html?company=${companyFromUrl}`;
-
-    if(companyFromUrl != "0"){
-      comp.style.display = "none"
-    }
-
-    const FORM = document.getElementById('companyForm');
-    FORM.addEventListener('submit', async function(e) {
-      e.preventDefault();
-
-      if(!nome || !responsavel || !email || !telefone){
-        toast('Preencha todos os campos obrigatórios.');
-        return;
-      }
-      
-      const payload = {
-        company_id: generateID(),
-        nome: document.getElementById('nome').value.trim(),
-        cnpj: document.getElementById('cnpj').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        responsavel: document.getElementById('responsavel').value.trim(),
-        telefone: document.getElementById('telefone').value.trim(),
-        created_at: new Date().toISOString()
-      };
-      
-      try {
-        const res = await fetch("https://webhook.franciscojlalves.com.br/webhook/company-intake", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        if (!res.ok) throw new Error("Erro ao cadastrar empresa");
-          toast("Empresa cadastrada com sucesso!");
-          FORM.reset();
-      } catch (err) {
-        console.error(err);
-        toast("Erro no cadastro. Tente novamente.");
-      }
-    });
-  </script>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 </body>
+
 </html>
