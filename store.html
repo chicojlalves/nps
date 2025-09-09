@@ -44,6 +44,7 @@
     <a id="menu_comp" href="company.html?company=0" style="color: #e5e7eb; text-decoration: none;">Empresa</a>
     <a id="menu_store" href="store.html?company=0" style="color: #38bdf8; text-decoration: none;">Loja</a>
     <a id="menu_user" href="user.html?company=0" style="color: #e5e7eb; text-decoration: none;">Colaborador</a>
+    <a id="menu_logoff" href="login.html" style="color: #e5e7eb; text-decoration: none;">Sair</a>
   </nav>
 <div class="wrap">
   <div class="card">
@@ -127,6 +128,10 @@
   const user = document.getElementById('menu_user')
   user.href = `user.html?company=${companyFromUrl}`;
 
+  if(companyFromUrl != "0"){
+    comp.style.display = "none"
+  }
+
   async function loadCompanys(){
     try {
       const res = await fetch(API.company);
@@ -136,13 +141,17 @@
 
       if(companyFromUrl != "0") { 
         company = (data.company || []).filter(s => s.id === companyFromUrl);
+        const select = document.getElementById('company_id');
+        select.innerHTML = //'<option value="">Selecione…</option>' + 
+          (company || []).map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
+          select.disabled = true;
+          loadStoreForCompany(companyFromUrl)
       }else{
         company = data.company;
+        const select = document.getElementById('company_id');
+        select.innerHTML = '<option value="">Selecione…</option>' + 
+          (company || []).map(a => `<option value="${a.id}">${a.nome}</option>`).join('');  
       }
-      
-      const select = document.getElementById('company_id');
-      select.innerHTML = '<option value="">Selecione…</option>' + 
-        (company || []).map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
     } catch {
       toast('Erro ao carregar empresas');
       document.getElementById('company_id').innerHTML = '<option value="">Erro ao carregar</option>';

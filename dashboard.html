@@ -95,6 +95,7 @@
     <a id="menu_comp" href="company.html?company=0" style="color: #e5e7eb; text-decoration: none;">Empresa</a>
     <a id="menu_store" href="store.html?company=0" style="color: #e5e7eb; text-decoration: none;">Loja</a>
     <a id="menu_user" href="user.html?company=0" style="color: #e5e7eb; text-decoration: none;">Colaborador</a>
+    <a id="menu_logoff" href="login.html" style="color: #e5e7eb; text-decoration: none;">Sair</a>
   </nav>
   <div class="wrap">
     <header>
@@ -176,6 +177,10 @@
     store.href = `store.html?company=${companyFromUrl}`;
     const user = document.getElementById('menu_user')
     user.href = `user.html?company=${companyFromUrl}`;
+
+    if(companyFromUrl != "0"){
+      comp.style.display = "none"
+    }
 
     async function apiGet(url, params){
       const qs = new URLSearchParams();
