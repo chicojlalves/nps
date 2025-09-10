@@ -1,13 +1,19 @@
 const companyFromUrl = getQueryParam('company');
+const idFromUrl = getQueryParam('id');
+const userFromUrl = getQueryParam('user');
+const funcaoFromUrl = getQueryParam('funcao');
 
-const dash = document.getElementById('menu_dash');
-dash.href = `dashboard.html?company=${companyFromUrl}`;
-const comp = document.getElementById('menu_comp');
-comp.href = `company.html?company=${companyFromUrl}`;
-const store = document.getElementById('menu_store');
-store.href = `store.html?company=${companyFromUrl}`;
-const user = document.getElementById('menu_user');
-user.href = `user.html?company=${companyFromUrl}`;
+const usuario = document.getElementById('user')
+usuario.textContent = "Bem vindo(a) - " + userFromUrl + "";
+
+const dash = document.getElementById('menu_dash')
+dash.href = `dashboard.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
+const comp = document.getElementById('menu_comp')
+comp.href = `company.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
+const store = document.getElementById('menu_store')
+store.href = `store.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
+const user = document.getElementById('menu_user')
+user.href = `user.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
 
 if (companyFromUrl != "0") {
     comp.style.display = "none"

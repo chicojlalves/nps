@@ -63,12 +63,6 @@ for (let i = 0; i <= 10; i++) {
     scale.appendChild(b);
 }
 
-function toast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3500);
-}
-
 function getSelectedScore() {
     const el = document.querySelector('.btn-score[data-active="true"]');
     return el ? Number(el.dataset.val) : null;

@@ -1,6 +1,5 @@
 const API = {
-    // login: 'https://n8n.franciscojlalves.com.br/webhook-test/login' // Ajuste para seu endpoint real
-    login: 'https://webhook.franciscojlalves.com.br/webhook/login' // Ajuste para seu endpoint real
+    login: 'https://webhook.franciscojlalves.com.br/webhook/nps/login' // Ajuste para seu endpoint real
 };
 
 function toast(msg) {
@@ -34,7 +33,12 @@ document.getElementById('loginForm').addEventListener('submit', async function (
             // Sucesso no login — você pode salvar o token, redirecionar, etc.
             localStorage.setItem("authToken", json.token);
             toast('Login realizado com sucesso!');
-            window.location.href = `dashboard.html?company=${json.token}`; // ou qualquer outra página
+
+            if (json.nome && json.id) {
+                window.location.href = `dashboard.html?company=${json.token}&id=${json.id}&user=${json.nome}&funcao=${json.funcao}`; // ou qualquer outra página
+            } else {
+                window.location.href = `dashboard.html?company=${json.token}`; // ou qualquer outra página
+            }
         } else {
             toast(json.message || 'Usuário ou senha inválidos.');
         }

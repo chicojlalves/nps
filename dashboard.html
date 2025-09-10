@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -12,8 +13,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-  
+
 </head>
+
 <body>
   <nav id="nav" class="nav_bar">
     <a id="menu_dash" href="dashboard.html?company=0" style="color: #38bdf8; text-decoration: none;">Dashboard</a>
@@ -23,33 +25,58 @@
     <a id="menu_logoff" href="/" style="color: #e5e7eb; text-decoration: none;">Sair</a>
   </nav>
   <div class="wrap">
+    <h3 id="user" class="user"></h3>
     <header>
       <h1>Dashboard Pesquisa de Satisfação</h1>
       <div class="filters">
         <div class="field"><label>De</label><input type="date" id="from"></div>
         <div class="field"><label>Até</label><input type="date" id="to"></div>
-        <div class="field"><label>Loja</label><select id="stores"><option value="">Selecione..</option></select></div>
+        <div class="field"><label>Loja</label><select id="stores">
+            <option value="">Selecione..</option>
+          </select></div>
         <button class="btn" id="apply">Aplicar</button>
       </div>
     </header>
 
     <section class="grid cols-4">
-      <div class="card kpi"><div class="label">NPS Geral</div><div class="value" id="kpi-nps">–</div><div class="trend" id="kpi-nps-trend"></div></div>
-      <div class="card kpi"><div class="label">Respostas</div><div class="value" id="kpi-total">–</div><div class="trend" id="kpi-total-trend"></div></div>
-      <div class="card kpi"><div class="label">Promotores</div><div class="value" id="kpi-prom">–</div><div class="trend" id="kpi-prom-trend"></div></div>
-      <div class="card kpi"><div class="label">Detratores</div><div class="value" id="kpi-detr">–</div><div class="trend" id="kpi-detr-trend"></div></div>
+      <div class="card kpi">
+        <div class="label">NPS Geral</div>
+        <div class="value" id="kpi-nps">–</div>
+        <div class="trend" id="kpi-nps-trend"></div>
+      </div>
+      <div class="card kpi">
+        <div class="label">Respostas</div>
+        <div class="value" id="kpi-total">–</div>
+        <div class="trend" id="kpi-total-trend"></div>
+      </div>
+      <div class="card kpi">
+        <div class="label">Promotores</div>
+        <div class="value" id="kpi-prom">–</div>
+        <div class="trend" id="kpi-prom-trend"></div>
+      </div>
+      <div class="card kpi">
+        <div class="label">Detratores</div>
+        <div class="value" id="kpi-detr">–</div>
+        <div class="trend" id="kpi-detr-trend"></div>
+      </div>
     </section>
 
     <section style="margin-top:14px">
-      <div class="card"><div id="chartByAtt" class="chart"></div></div>
+      <div class="card">
+        <div id="chartByAtt" class="chart"></div>
+      </div>
     </section>
 
     <section style="margin-top:14px">
-      <div class="card"><div id="chartTimeseries" class="chart"></div></div>
+      <div class="card">
+        <div id="chartTimeseries" class="chart"></div>
+      </div>
     </section>
-    
+
     <section style="margin-top:14px">
-      <div class="card"><div id="chartDonut" class="chart"></div></div>
+      <div class="card">
+        <div id="chartDonut" class="chart"></div>
+      </div>
     </section>
 
     <section id="comments" style="margin-top:24px">
@@ -67,14 +94,15 @@
         </table>
       </div>
     </section>
-    
+
     <div class="footer">Atualizado: <span id="lastUpdate">–</span></div>
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
-  
+
   </script>
 </body>
+
 </html>

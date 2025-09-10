@@ -6,17 +6,53 @@ const API = {
   users: "https://webhook.franciscojlalves.com.br/webhook/nps/colaborator",
 }
 
-const companyFromUrl = getQueryParam("company");
+const companyFromUrl = getQueryParam('company');
+const idFromUrl = getQueryParam('id');
+const userFromUrl = getQueryParam('user');
+const funcaoFromUrl = getQueryParam('funcao');
 
-const dash = document.getElementById("menu_dash");
-dash.href = `dashboard.html?company=${companyFromUrl}`;
-const comp = document.getElementById("menu_comp");
-comp.href = `company.html?company=${companyFromUrl}`;
-const store = document.getElementById("menu_store");
-store.href = `store.html?company=${companyFromUrl}`;
-const user = document.getElementById("menu_user");
-user.href = `user.html?company=${companyFromUrl}`;
+const usuario = document.getElementById('user')
+usuario.textContent = "Bem vindo(a) - " + userFromUrl + "";
 
+const dash = document.getElementById('menu_dash')
+dash.href = `dashboard.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
+const comp = document.getElementById('menu_comp')
+comp.href = `company.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
+const store = document.getElementById('menu_store')
+store.href = `store.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
+const user = document.getElementById('menu_user')
+user.href = `user.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
+
+//const prop = document.getElementById('prop');
+const sup = document.getElementById('sup');
+const ger = document.getElementById('ger');
+
+function loadRoles(funcaoFromUrl) {
+
+  console.log(funcaoFromUrl)
+
+  switch (funcaoFromUrl) {
+    case "Proprietario":
+      console.log('1');
+      ger.style.display = "block";
+      sup.style.display = "block";
+      break;
+
+    case "Supervisor":
+      console.log('2');
+      ger.style.display = "block";
+      sup.style.display = "none";
+      break;
+
+    default:
+      console.log('3');
+      ger.style.display = "none";
+      sup.style.display = "none";
+      break;
+
+  }
+
+}
 if (companyFromUrl != "0") {
   comp.style.display = "none";
 }
@@ -69,10 +105,12 @@ async function loadStoresForCompany(company_id) {
 
 loadUserForCompany(companyFromUrl);
 
+
 document.getElementById("company_id").addEventListener("change", function () {
   const company_id = this.value;
   loadStoresForCompany(company_id);
   loadUserForCompany(company_id);
+  loadRoles(funcaoFromUrl);
 });
 
 document
@@ -144,6 +182,7 @@ if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", loadCompanys);
 } else {
   loadCompanys();
+  loadRoles(funcaoFromUrl)
 }
 
 document.getElementById("role").addEventListener("change", function () {
