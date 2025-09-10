@@ -29,13 +29,15 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 
         const json = await res.json();
 
+        console.log(json)
+
         if (res.ok && json.token) {
             // Sucesso no login — você pode salvar o token, redirecionar, etc.
             localStorage.setItem("authToken", json.token);
             toast('Login realizado com sucesso!');
 
-            if (json.nome && json.id) {
-                window.location.href = `dashboard.html?company=${json.token}&id=${json.id}&user=${json.nome}&funcao=${json.funcao}`; // ou qualquer outra página
+            if (json.nome && json.token) {
+                window.location.href = `dashboard.html?company=${json.token}&store=${json.loja_id}&user=${json.nome}&funcao=${json.funcao}`; // ou qualquer outra página
             } else {
                 window.location.href = `dashboard.html?company=${json.token}`; // ou qualquer outra página
             }

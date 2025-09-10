@@ -4,20 +4,13 @@ const API = {
     store: 'https://webhook.franciscojlalves.com.br/webhook/nps/store',
 }
 
-function toast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3500);
-}
-
 function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param) || '';
 }
 
 const companyFromUrl = getQueryParam('company');
-const idFromUrl = getQueryParam('id');
+const storeFromUrl = getQueryParam('store');
 const userFromUrl = getQueryParam('user');
 const funcaoFromUrl = getQueryParam('funcao');
 
@@ -25,13 +18,13 @@ const usuario = document.getElementById('user')
 usuario.textContent = "Bem vindo(a) - " + userFromUrl + "";
 
 const dash = document.getElementById('menu_dash')
-dash.href = `dashboard.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
+dash.href = `dashboard.html?company=${companyFromUrl}&store=${storeFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
 const comp = document.getElementById('menu_comp')
-comp.href = `company.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
+comp.href = `company.html?company=${companyFromUrl}&store=${storeFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
 const store = document.getElementById('menu_store')
-store.href = `store.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
+store.href = `store.html?company=${companyFromUrl}&store=${storeFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
 const user = document.getElementById('menu_user')
-user.href = `user.html?company=${companyFromUrl}&id=${idFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
+user.href = `user.html?company=${companyFromUrl}&store=${storeFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
 
 if (companyFromUrl != "0") {
     comp.style.display = "none"
@@ -105,13 +98,15 @@ async function loadAttendants(att) {
     }
 }
 
-async function loadStoresForCompany(company_id) {
+async function loadStoresForCompany(company_id, store_id) {
     try {
         const res = await fetch(API.store);
         const { data } = await res.json();
         let lojas = [];
 
-        if (company_id !== "0") {
+        if (company_id !== "0" && company_id != "" && store_id != "" && store_id != "0") {
+            lojas = (data.store || []).filter(s => s.company_id === company_id && s.id === store_id);
+        } else if (company_id !== "0" && company_id != "") {
             lojas = (data.store || []).filter(s => s.company_id === company_id);
         } else {
             lojas = data.store;
@@ -184,11 +179,13 @@ async function loadComments(params) {
 async function refresh() {
 
     const companyFromUrl = getQueryParam('company');
+    const storeFromUrl = getQueryParam('store');
     const params = collectFilters();
 
     if (companyFromUrl) {
 
         const all = (await apiGet(API.dashboard, params)).data || {};
+
         const s = all.summary || {};
         const ba = all.byAttendant || [];
         const st = all.stores || {};
@@ -215,7 +212,7 @@ async function refresh() {
         loadComments(all)
 
         // lojas
-        loadStoresForCompany(companyFromUrl)
+        loadStoresForCompany(companyFromUrl, storeFromUrl)
 
     }
     document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
@@ -224,7 +221,8 @@ async function refresh() {
 function collectFilters() {
     const from = document.getElementById('from').value;
     const to = document.getElementById('to').value;
-    const st = (document.getElementById('stores').value || '').trim();
+    // const st = (document.getElementById('stores').value || '').trim();
+    const st = (getQueryParam('store') || '');
     const cp = (getQueryParam('company') || '');
     return { from, to, stores: st, company: cp || undefined };
 }
@@ -251,8 +249,6 @@ function trendText(v, invert) {
 
     // 1ª atualização já com filtros aplicados
     await refresh();
-
-    const companyFromUrl = getQueryParam('company');
 
     // um único listener no botão
     const applyBtn = document.getElementById('apply');
