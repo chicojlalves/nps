@@ -110,6 +110,8 @@ async function loadStoreForCompany(company_id) {
         const { data } = await res.json();
         let lojas = [];
 
+        console.log(data.store)
+
         if (company_id !== "0" && company_id != "" && store_id != "" && store_id != "0") {
             lojas = (data.store || []).filter(s => s.company_id === company_id && s.id === store_id);
         } else if (company_id !== "0" && company_id != "") {

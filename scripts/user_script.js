@@ -1,8 +1,7 @@
 const API = {
   companies: "https://webhook.franciscojlalves.com.br/webhook/nps/company",
   stores: "https://webhook.franciscojlalves.com.br/webhook/nps/store",
-  collaborators:
-    "https://webhook.franciscojlalves.com.br/webhook/collab-intake",
+  collaborators: "https://webhook.franciscojlalves.com.br/webhook/collab-intake",
   users: "https://webhook.franciscojlalves.com.br/webhook/nps/colaborator",
 }
 
@@ -23,13 +22,19 @@ store.href = `store.html?company=${companyFromUrl}&store=${storeFromUrl}&user=${
 const user = document.getElementById('menu_user')
 user.href = `user.html?company=${companyFromUrl}&store=${storeFromUrl}&user=${userFromUrl}&funcao=${funcaoFromUrl}`;
 
-//const prop = document.getElementById('prop');
+const prop = document.getElementById('prop');
 const sup = document.getElementById('sup');
 const ger = document.getElementById('ger');
 
 function loadRoles(funcaoFromUrl) {
 
   switch (funcaoFromUrl) {
+    case "Admin":
+      ger.style.display = "block";
+      sup.style.display = "block";
+      prop.style.display = "block";
+      break;
+
     case "Proprietario":
       ger.style.display = "block";
       sup.style.display = "block";
@@ -43,6 +48,7 @@ function loadRoles(funcaoFromUrl) {
     default:
       ger.style.display = "none";
       sup.style.display = "none";
+      prop.style.display = "none";
       break;
 
   }
@@ -71,10 +77,8 @@ async function loadCompanys() {
     } else {
       company = data.company;
       const select = document.getElementById("company_id");
-      select.innerHTML =
-        '<option value="">Selecione…</option>' +
-        (company || [])
-          .map((c) => `<option value="${c.id}">${c.nome}</option>`)
+      select.innerHTML = '<option value="">Selecione…</option>' +
+        (company || []).map((c) => `<option value="${c.id}">${c.nome}</option>`)
           .join("");
     }
   } catch {
@@ -84,10 +88,11 @@ async function loadCompanys() {
 
 async function loadStoresForCompany(company_id) {
   try {
-    const store_id = getQueryParam('store')
+    const store_id = getQueryParam('store');
     const res = await fetch(API.stores);
     const { data } = await res.json();
     let lojas = [];
+
 
     if (company_id !== "0" && company_id != "" && store_id != "" && store_id != "0") {
       lojas = (data.store || []).filter(s => s.company_id === company_id && s.id === store_id);
@@ -108,9 +113,9 @@ async function loadStoresForCompany(company_id) {
 
 loadUserForCompany(companyFromUrl);
 
-
 document.getElementById("company_id").addEventListener("change", function () {
   const company_id = this.value;
+
   loadStoresForCompany(company_id);
   loadUserForCompany(company_id);
   loadRoles(funcaoFromUrl);
@@ -195,7 +200,7 @@ document.getElementById("role").addEventListener("change", function () {
   const confirme_senha = document.getElementById("confirme_senha");
   const role = this.value;
 
-  if (role === "Supervisor(a)" || role === "Gerente") {
+  if (role === "Supervisor(a)" || role === "Gerente" || role === "Proprietario(a)") {
     credenciais.style.display = "block";
     email.setAttribute("required", "");
     senha.setAttribute("required", "");
