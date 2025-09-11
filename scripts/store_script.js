@@ -25,6 +25,11 @@ if (companyFromUrl != "0") {
     comp.style.display = "none"
 }
 
+if (funcaoFromUrl === "Gerente") {
+    const nome = document.getElementById('nome');
+    nome.disabled = true
+}
+
 async function loadCompanys() {
     try {
         const res = await fetch(API.company);
@@ -99,10 +104,19 @@ document.getElementById('company_id').addEventListener('change', function () {
 
 async function loadStoreForCompany(company_id) {
     try {
+        const store_id = getQueryParam('store');
 
         const res = await fetch(API.stores);
         const { data } = await res.json();
-        const lojas = (data.store || []).filter(s => s.company_id === company_id);
+        let lojas = [];
+
+        if (company_id !== "0" && company_id != "" && store_id != "" && store_id != "0") {
+            lojas = (data.store || []).filter(s => s.company_id === company_id && s.id === store_id);
+        } else if (company_id !== "0" && company_id != "") {
+            lojas = (data.store || []).filter(s => s.company_id === company_id);
+        } else {
+            lojas = data.store;
+        }
 
         const tbody = document.getElementById('storeList');
         if (!lojas || !lojas.length) {

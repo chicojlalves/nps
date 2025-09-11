@@ -29,23 +29,18 @@ const ger = document.getElementById('ger');
 
 function loadRoles(funcaoFromUrl) {
 
-  console.log(funcaoFromUrl)
-
   switch (funcaoFromUrl) {
     case "Proprietario":
-      console.log('1');
       ger.style.display = "block";
       sup.style.display = "block";
       break;
 
     case "Supervisor":
-      console.log('2');
       ger.style.display = "block";
       sup.style.display = "none";
       break;
 
     default:
-      console.log('3');
       ger.style.display = "none";
       sup.style.display = "none";
       break;
@@ -87,13 +82,21 @@ async function loadCompanys() {
   }
 }
 
-let lojas = [];
-
 async function loadStoresForCompany(company_id) {
   try {
+    const store_id = getQueryParam('store')
     const res = await fetch(API.stores);
     const { data } = await res.json();
-    lojas = (data.store || []).filter((s) => s.company_id === company_id);
+    let lojas = [];
+
+    if (company_id !== "0" && company_id != "" && store_id != "" && store_id != "0") {
+      lojas = (data.store || []).filter(s => s.company_id === company_id && s.id === store_id);
+    } else if (company_id !== "0" && company_id != "") {
+      lojas = (data.store || []).filter(s => s.company_id === company_id);
+    } else {
+      lojas = data.store;
+    }
+
     const select = document.getElementById("store_id");
     select.innerHTML =
       '<option value="">Selecione…</option>' +
@@ -211,20 +214,32 @@ document.getElementById("role").addEventListener("change", function () {
 
 async function loadUserForCompany(company_id) {
   try {
+    const store_id = getQueryParam('store');
+
     const resColabs = await fetch(API.users);
     var { data } = await resColabs.json();
-    const colabs = (data.users || []).filter(
-      (s) => s.company_id === company_id
-    );
+    const colaborators = (data.users || [])
 
     const res = await fetch(API.stores);
     var { data } = await res.json();
-    const lojas = data.store || [];
+    const stores = (data.store || []);
 
-    let colaborador = [];
+    let colabs = [];
+    let lojas = [];
+
+    if (company_id !== "0" && company_id != "" && store_id != "" && store_id != "0") {
+      lojas = (stores || []).filter(s => s.company_id === company_id && s.id === store_id);
+      colabs = (colaborators || []).filter(s => s.company_id === company_id && s.store_id === store_id);
+
+    } else if (company_id !== "0" && company_id != "") {
+      lojas = (stores || []).filter(s => s.company_id === company_id);
+      colabs = (colaborators || []).filter(s => s.company_id === company_id);
+    } else {
+      lojas = stores;
+      colabs = colaborators;
+    }
 
     for (let i = 0; i < colabs.length; i++) {
-      colaborador = colabs[i];
       for (let j = 0; j < lojas.length; j++) {
         if (colabs[i].store_id === lojas[j].id) {
           colabs[i]["loja"] = lojas[j].nome;
