@@ -98,8 +98,9 @@ async function loadAttendants(att) {
     }
 }
 
-async function loadStoresForCompany(company_id, store_id) {
+async function loadStoresForCompany(company_id) {
     try {
+        const store_id = getQueryParam('store')
         const res = await fetch(API.store);
         const { data } = await res.json();
         let lojas = [];
@@ -179,7 +180,6 @@ async function loadComments(params) {
 async function refresh() {
 
     const companyFromUrl = getQueryParam('company');
-    const storeFromUrl = getQueryParam('store');
     const params = collectFilters();
 
     if (companyFromUrl) {
@@ -212,7 +212,7 @@ async function refresh() {
         loadComments(all)
 
         // lojas
-        loadStoresForCompany(companyFromUrl, storeFromUrl)
+        loadStoresForCompany(companyFromUrl)
 
     }
     document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
@@ -221,8 +221,7 @@ async function refresh() {
 function collectFilters() {
     const from = document.getElementById('from').value;
     const to = document.getElementById('to').value;
-    // const st = (document.getElementById('stores').value || '').trim();
-    const st = (getQueryParam('store') || '');
+    const st = (document.getElementById('stores').value || getQueryParam('store')).trim();
     const cp = (getQueryParam('company') || '');
     return { from, to, stores: st, company: cp || undefined };
 }
