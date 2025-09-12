@@ -35,14 +35,16 @@ function loadRoles(funcaoFromUrl) {
       prop.style.display = "block";
       break;
 
-    case "Proprietario":
+    case "Proprietario(a)":
       ger.style.display = "block";
       sup.style.display = "block";
+      prop.style.display = "none";
       break;
 
-    case "Supervisor":
+    case "Supervisor(a)":
       ger.style.display = "block";
       sup.style.display = "none";
+      prop.style.display = "none";
       break;
 
     default:
@@ -77,7 +79,7 @@ async function loadCompanys() {
     } else {
       company = data.company;
       const select = document.getElementById("company_id");
-      select.innerHTML = '<option value="">Selecione…</option>' +
+      select.innerHTML = '<option value="0">Selecione…</option>' +
         (company || []).map((c) => `<option value="${c.id}">${c.nome}</option>`)
           .join("");
     }
@@ -104,7 +106,7 @@ async function loadStoresForCompany(company_id) {
 
     const select = document.getElementById("store_id");
     select.innerHTML =
-      '<option value="">Selecione…</option>' +
+      '<option value="0">Selecione…</option>' +
       lojas.map((s) => `<option value="${s.id}">${s.nome}</option>`).join("");
   } catch {
     toast("Erro ao carregar colaboradores");
@@ -198,15 +200,23 @@ document.getElementById("role").addEventListener("change", function () {
   const email = document.getElementById("email");
   const senha = document.getElementById("senha");
   const confirme_senha = document.getElementById("confirme_senha");
+  const store = document.getElementById("store_id");
   const role = this.value;
 
-  if (role === "Supervisor(a)" || role === "Gerente" || role === "Proprietario(a)") {
+  if (role === "Supervisor(a)" || role === "Gerente") {
     credenciais.style.display = "block";
+    email.setAttribute("required", "");
+    senha.setAttribute("required", "");
+    confirme_senha.setAttribute("required", "");
+  } else if (role === "Proprietario(a)") {
+    credenciais.style.display = "block";
+    store.removeAttribute("required");
     email.setAttribute("required", "");
     senha.setAttribute("required", "");
     confirme_senha.setAttribute("required", "");
   } else {
     credenciais.style.display = "none";
+    store.removeAttribute("required");
     email.removeAttribute("required");
     senha.removeAttribute("required");
     confirme_senha.removeAttribute("required");
