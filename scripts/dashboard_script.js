@@ -116,7 +116,7 @@ async function loadStoresForCompany(company_id) {
         const select = document.getElementById('stores');
         const currentValue = select.value;
 
-        select.innerHTML = '<option value="">Todas</option>' +
+        select.innerHTML = '<option value="0">Todas</option>' +
             lojas.map(s => {
                 const isSelected = s.id === currentValue ? ' selected' : '';
                 return `<option ${isSelected} value="${s.id}">${s.nome}</option>`;
@@ -185,6 +185,8 @@ async function refresh() {
     if (companyFromUrl) {
 
         const all = (await apiGet(API.dashboard, params)).data || {};
+
+        console.log(all)
 
         const s = all.summary || {};
         const ba = all.byAttendant || [];
